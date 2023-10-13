@@ -7,7 +7,7 @@ Stream-Processing, functioning as a Function as a Service (FaaS) solution, empow
 
 ## Agnostic to Programming Languages
 
-Our Stream-Processing solution is language-agnostic, capable of hosting microservices written in any programming language, thanks to its utilization of Kubernetes for deployment. Developers are relieved from the need to understand RabbitMQ communication intricacies. Each microservice is deployed alongside a <a href=https://github.com/f-coda/Stream-Processing/tree/main/publish>companion container</a> that manages communication with RabbitMQ. Developers only need to interact with the endpoints of this companion container to publish or receive messages, simplifying their workflow.
+Our Stream-Processing solution is language-agnostic, capable of hosting microservices written in any programming language, thanks to its utilization of Kubernetes for deployment. Developers are relieved from the need to understand RabbitMQ communication intricacies. Each microservice is deployed alongside a <a href=https://github.com/f-coda/Stream-Processing/tree/main/companion>companion container</a> that manages communication with RabbitMQ. Developers only need to interact with the endpoints of this companion container to publish or receive messages, simplifying their workflow.
 
 ## Installation
 
