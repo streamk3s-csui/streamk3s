@@ -183,8 +183,8 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                                 "spec": {
                                     "containers": [
                                         {
-                                            "name": "publish-container",
-                                            "image": "gkorod/publish:v2.4",
+                                            "name": "companion-container",
+                                            "image": "gkorod/companion:v2.4",
                                             "imagePullPolicy": "Always",
                                             "env": [
                                                 {

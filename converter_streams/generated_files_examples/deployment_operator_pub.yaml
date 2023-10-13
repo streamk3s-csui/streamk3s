@@ -16,8 +16,8 @@ spec:
     envFrom:
       - configMapRef:
           name: appconfig
-  - name: publish-container
-    image: gkorod/publish:v0.1
+  - name: companion-container
+    image: gkorod/companion:v0.1
     imagePullPolicy: Always
     env:
       - name: RABBITMQ_PASSWORD

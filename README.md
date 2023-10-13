@@ -3,7 +3,7 @@
 Stream-Processing, functioning as a Function as a Service (FaaS) solution, empowers developers to introduce their own containerized streaming modules into our K3s cluster. This is achieved by defining communication patterns within NodeRED. NodeRED is capable of extracting fields and generating a TOSCA extension in JSON format. This extension describes the communication structure and scaling behavior of these modules. The TOSCA description is then processed by the Converter component. This component validates the TOSCA using the <a href=https://github.com/di-unipi-socc/Sommelier>TOSCA Sommelier validator</a>. If the TOSCA is deemed valid, the Converter generates corresponding Kubernetes files. It also configures RabbitMQ to facilitate communication between components via streams and sets up <a href=https://keda.sh/>KEDA</a> to implement scaling rules linked to RabbitMQ for each component.
 
 ## Architecture
-![alt text](Streaming%20Processing%20v2.drawio%20(6).png)
+![alt text](Streaming%20Processing%20v2.png)
 
 ## Agnostic to Programming Languages
 
