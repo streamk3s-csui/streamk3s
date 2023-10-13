@@ -1,0 +1,93 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+
+description: Application model for streams architecture
+
+imports:
+  - definitions/custom_types.yaml
+
+topology_template:
+
+  node_templates:
+
+    Host-1:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            num_cpus: 1
+            mem_size: 512MB
+            disk_size: 10GB
+        os:
+          properties:
+            architecture: x86_64
+            type: linux
+
+    Host-2:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            num_cpus: 1
+            mem_size: 2GB
+            disk_size: 2GB
+        os:
+          properties:
+            architecture: x86_64
+            type: linux
+
+
+
+    Operator-1:
+      type: Operator
+      properties:
+        image: gkorod/generator:v0.3
+        name: generator
+        application: experiment-ais
+        operator_type: producer
+        order: 1
+        topics:
+          properties:
+            output_topic: topic-1
+        port:
+          - 20766
+      requirements:
+        - host: Host-1
+
+    Operator-2:
+      type: Operator
+      properties:
+        image: gkorod/grouper:v0.1
+        name: grouper
+        application: experiment-ais
+        operator_type: subscriber
+        order: 2
+        topics:
+          properties:
+            input_topic: topic-1
+            output_topic: topic-2
+        scale:
+          - rule: 1
+            condition: MessageRate = 16
+            input_topic: topic-1
+            scale: 3
+        port:
+          - 20766
+      requirements:
+        - host: Host-2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

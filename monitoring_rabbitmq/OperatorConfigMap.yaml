@@ -1,0 +1,11 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: appconfig
+  namespace: rabbit
+data:
+  API_PORT: "4321"
+  PUBLISH_PATH: "/post_message"
+  GET_PATH: "/get_message"
+  MESSAGE: |
+    {"json":"message"}

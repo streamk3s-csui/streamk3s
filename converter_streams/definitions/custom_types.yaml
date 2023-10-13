@@ -1,0 +1,77 @@
+tosca_definitions_version: tosca_simple_yaml_1_2
+description: ACCORDION node types
+
+
+
+
+data_types:
+  topics:
+    properties:
+      input_topic:
+        type: string
+        required: false
+      output_topic:
+        type: string
+        required: false
+
+  configuration:
+    properties:
+      name:
+        type: string
+      producer:
+        type: string
+      consumer:
+        type: string
+
+  rules:
+    properties:
+      rule:
+        type: integer
+      condition:
+        type: string
+      output_topic:
+        type: string
+        required: false
+      input_topic:
+        type: string
+        required: false
+      scale:
+        type: integer
+
+
+node_types:
+
+
+
+
+  Operator:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      image:
+        type: string
+      name:
+        type: string
+      application:
+        type: string
+      operator_type:
+        type: string
+        constraints:
+          - valid_values: [ subscriber, producer ]
+      order:
+        type: integer
+      topics:
+        type: map
+        entry_schema:
+          type: topics
+
+      scale:
+        type: list
+        required: false
+        entry_schema:
+          type: rules
+      port:
+        type: list
+        required: true
+
+
+

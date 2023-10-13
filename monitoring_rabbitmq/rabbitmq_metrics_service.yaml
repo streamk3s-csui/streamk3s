@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitorable-rabbit-mq
+  namespace: rabbit
+  labels:
+    app: monitorable-rabbit-mq
+spec:
+  ports:
+  - name: metrics
+    targetPort: 15692
+    port: 15692
+  selector:
+    app: rabbitmq
+    release: mu-rabbit
