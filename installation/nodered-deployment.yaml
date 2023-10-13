@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mynodered
+  namespace: gui  # Specify the namespace here
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mynodered
+  template:
+    metadata:
+      labels:
+        app: mynodered
+    spec:
+      containers:
+      - name: mynodered
+        image: nodered/node-red
+        ports:
+        - containerPort: 1880
+        stdin: true
+        tty: true
+        resources: {}  # You can specify resource limits and requests here if needed
+      restartPolicy: Always  # This ensures the container restarts unless explicitly stopped

@@ -16,7 +16,8 @@ kubectl expose -n rabbit pod mu-rabbit-rabbitmq-0 --port=15672 --target-port=156
 echo "--------------------------------------------"
 echo "NodeRED"
 echo "--------------------------------------------"
-docker run -it -p 1880:1880 -d --restart unless-stopped --name mynodered nodered/node-red
+kubectl apply -f nodered-namespace.yaml
+kubectl apply -f nodered-deployment.yaml
 echo "--------------------------------------------"
 echo "KEDA"
 echo "--------------------------------------------"
