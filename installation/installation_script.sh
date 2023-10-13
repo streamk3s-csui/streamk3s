@@ -34,12 +34,30 @@ kubectl apply --server-side -f https://github.com/kedacore/keda/releases/downloa
 echo "--------------------------------------------"
 echo "Converter"
 echo "--------------------------------------------"
-cp /installation/converter.service /etc/systemd/system/
+cp converter.service /etc/systemd/system/
 systemctl enable converter.service
 systemctl start converter.service
 echo "--------------------------------------------"
 echo "Instance Manager"
-cp /installation/instancemanager.service /etc/systemd/system/
+RABBITMQ_USERNAME=$(kubectl get secret rabbitmq-credentials -n rabbit -o jsonpath="{.data.RABBITMQ_DEFAULT_USER}" | base64 --decode)
+RABBITMQ_PASSWORD=$(kubectl get secret rabbitmq-credentials -n rabbit -o jsonpath="{.data.RABBITMQ_DEFAULT_PASS}" | base64 --decode)
+# Create .env file and store the credentials
+pod_ip=$(kubectl get pod mu-rabbit-rabbitmq-0 -n rabbit -o jsonpath='{.status.podIP}')
+cd ..
+cd instancemanager
+echo "RABBITMQ_USERNAME=$RABBITMQ_USERNAME" > .env
+echo "RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD" >> .env
+if [[ -n "$pod_ip" ]]; then
+    # Create .env file and store the pod IP address
+    echo "POD_IP=$pod_ip" > .env
+    echo "Pod IP Address found: $pod_ip"
+else
+    # If pod IP address is not found, display a message
+    echo "Pod IP Address not found for pod '$pod_name' in namespace '$namespace'."
+fi
+cp instancemanager.service /etc/systemd/system/
 systemctl enable instancemanager.service
 systemctl start instancemanager.service
+cd ..
+cd installation
 echo "--------------------------------------------"

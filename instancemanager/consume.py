@@ -11,9 +11,9 @@ from requests.auth import HTTPBasicAuth
 consumer_list = []
 message_list = []
 logging.getLogger().setLevel(logging.INFO)
-rabbit_ip = "10.100.59.176"
-user = 'user'
-password = "0D5URWkIag"
+user = os.getenv("RABBITMQ_USERNAME", "name")
+rabbit_ip = os.getenv("POD_IP", "ip")
+password = os.getenv("RABBITMQ_PASSWORD", "password")
 application = "experiment-ais"
 credentials = pika.PlainCredentials(user, password)
 consume_connection = pika.BlockingConnection(
