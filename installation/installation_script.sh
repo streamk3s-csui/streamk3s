@@ -31,3 +31,15 @@ echo "KEDA"
 echo "--------------------------------------------"
 # Without admission webhooks
 kubectl apply --server-side -f https://github.com/kedacore/keda/releases/download/v2.12.0/keda-2.12.0-core.yaml
+echo "--------------------------------------------"
+echo "Converter"
+echo "--------------------------------------------"
+cp /installation/converter.service /etc/systemd/system/
+systemctl enable converter.service
+systemctl start converter.service
+echo "--------------------------------------------"
+echo "Instance Manager"
+cp /installation/instancemanager.service /etc/systemd/system/
+systemctl enable instancemanager.service
+systemctl start instancemanager.service
+echo "--------------------------------------------"

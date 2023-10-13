@@ -1,0 +1,9 @@
+[Unit]
+Description=Converter
+After=multi-user.target
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/python3 ./converter_streams/REST-API.py
+[Install]
+WantedBy=multi-user.target
