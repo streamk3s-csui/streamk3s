@@ -3,6 +3,14 @@ echo "Requirements"
 echo "--------------------------------------------"
 apt update
 apt install snapd
+apt-get install python3.6
+apt install python3-pip
+pip install oyaml
+pip install hurry.filesize
+pip install PyYAML
+pip install Flask
+pip install tosca-parser
+pip install pika
 snap install helm --classic
 echo "--------------------------------------------"
 echo "RabbitMQ"
