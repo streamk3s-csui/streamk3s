@@ -9,6 +9,12 @@ Stream-Processing, functioning as a Function as a Service (FaaS) solution, empow
 
 Our Stream-Processing solution is language-agnostic, capable of hosting microservices written in any programming language, thanks to its utilization of Kubernetes for deployment. Developers are relieved from the need to understand RabbitMQ communication intricacies. Each microservice is deployed alongside a <a href=https://github.com/f-coda/Stream-Processing/tree/main/companion>companion container</a> that manages communication with RabbitMQ. Developers only need to interact with the endpoints of this companion container to publish or receive messages, simplifying their workflow.
 
+## Main components of this repository
+
+* <a href="https://github.com/f-coda/Stream-Processing/tree/main/companion"> Companion Container</a>
+* <a href="https://github.com/f-coda/Stream-Processing/tree/main/converter_streams"> Converter Service</a>
+* <a href="https://github.com/f-coda/Stream-Processing/tree/main/instancemanager"> Instance Manager Service</a> 
+* <a href="https://github.com/f-coda/Stream-Processing/tree/main/operator"> Operator Container</a> 
 ## Installation
 
 The platform's unified installation script is accessible <a href="https://github.com/f-coda/Stream-Processing/tree/main/installation">here</a>. RabbiMQ, KEDA, and NodeRED are installed as pods, while Instance Manager and Converter are deployed as Services on Linux. Prior to platform installation, a Kubernetes Cluster must be in place. The script manages all other necessary requirements automatically.
