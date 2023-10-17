@@ -1,4 +1,116 @@
-## Description
+## TOSCA
+The Stream Processing platform utilizes an extension of the TOSCA open standard by OASIS to outline the deployment and scaling of applications in Kubernetes and KEDA, respectively. TOSCA, on its own, can describe application components, as well as their deployment and runtime adaptation hosts, within topologies.
+
+### TOSCA extension
+Within this framework, two essential entities are required:
+
+* A new entity named `Operator` was introduced to depict operators on our platform. It is derived from the default `tosca.nodes.SoftwareComponent`, which initially described software components.
+* The default entity to describe hosts, including their hardware and OS capabilities in TOSCA, is `tosca.nodes.Compute`.
+
+You can find the definitions of our custom extended language <a href=https://github.com/f-coda/Stream-Processing/tree/main/converter_streams/definitions>here</a>.
+#### example
+The following example is describing the deployment and scaling of two operators (Operator-1 and Operator-2) in our platform.
+Operator-1 is connected with Host-1 via host requirement. Similarly, Operator-2 is connected with Host-2 with the usage of the same requirement.
+
+<b>Operator Descriptions:</b>
+
+| Properties    | Meaning                                                                                                                                                 |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| image         | Name of the Docker image                                                                                                                                |
+| name          | Name of the operator                                                                                                                                    |
+| operator_type | An operator can be producer or subscriber                                                                                                               |
+| order         | The deployment order of operators                                                                                                                       |
+| topics        | Specify the topics with which the operator should establish communication. Each operator may have zero or one input_topic and zero or one output_topic. |
+| scale         | It includes rules based on conditions supported by KEDA, which are associated with either MessageRate or QueueLength.                                   |
+| port          | It lists the ports utilized by an operator.                                                                                                             |
+| requirements  | It encompasses the host requirement linking an Operator with a Host, detailing the hardware prerequisites of the Operator.r                   |
+
+b>Host Descriptions:</b>
+
+| Capabilities | Meaning                                                                       |
+|--------------|-------------------------------------------------------------------------------|
+| host         | It describes the computing power of a host in matters of CPU, RAM and disk    |
+| os           | It describes the desired operating system in matters of architecture and type |
+
+
+``` yaml
+tosca_definitions_version: tosca_simple_yaml_1_2
+
+description: Application model for streams architecture
+
+imports:
+  - definitions/custom_types.yaml
+
+topology_template:
+
+  node_templates:
+
+    Host-1:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            num_cpus: 1
+            mem_size: 512MB
+            disk_size: 10GB
+        os:
+          properties:
+            architecture: x86_64
+            type: linux
+
+    Host-2:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            num_cpus: 1
+            mem_size: 2GB
+            disk_size: 2GB
+        os:
+          properties:
+            architecture: x86_64
+            type: linux
+
+    Operator-1:
+      type: Operator
+      properties:
+        image: gkorod/generator:v0.3
+        name: generator
+        application: experiment-ais
+        operator_type: producer
+        order: 1
+        topics:
+          properties:
+            output_topic: topic-1
+        port:
+          - 20766
+      requirements:
+        - host: Host-1
+
+    Operator-2:
+      type: Operator
+      properties:
+        image: gkorod/grouper:v0.1
+        name: grouper
+        application: experiment-ais
+        operator_type: subscriber
+        order: 2
+        topics:
+          properties:
+            input_topic: topic-1
+            output_topic: topic-2
+        scale:
+          - rule: 1
+            condition: MessageRate = 16
+            input_topic: topic-1
+            scale: 3
+        port:
+          - 20766
+      requirements:
+        - host: Host-2
+```
+The above example can be also found <a href=https://github.com/f-coda/Stream-Processing/tree/main/converter_streams/tosca_extension_example>here</a>
+### Converter
 The Converter component functions as a reasoner tool capable of both reading and generating Kubernetes definition YAML files. It is seamlessly integrated with the Sommelier Validator. Initially, Sommelier Validator is employed to validate our TOSCA extension. Upon confirming the validity of the provided model, Converter is then able to generate the necessary files.
 
 ### Sommelier Validator
@@ -14,7 +126,7 @@ The code for Sommelier can be found in this <a href=https://github.com/di-unipi-
 ### How Sommelier & Converter works in our Platform
 
 1. An HTTP Post endpoint <mark>\submit</mark> within the <mark>validate()</mark> function is being provided by <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/REST-API.py>REST-API.py</a>. This endpoint expects TOSCA data in JSON format from NodeRED. Upon receiving the TOSCA model, it is temporarily stored as a YAML file.
-2. The temporary file is sent to Sommelier Validator through the <mark>validation(path)</mark> function in the <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/sommelier.py>sommelier.py</a> script. This function validates TOSCA models in YAML format. Sommelier is capable of validating TOSCA models based on the definitions of the objects it recognizes. You can find the definitions of our custom extended language <a href=https://github.com/f-coda/Stream-Processing/tree/main/converter_streams/definitions>here</a>.
+2. The temporary file is sent to Sommelier Validator through the <mark>validation(path)</mark> function in the <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/sommelier.py>sommelier.py</a> script. This function validates TOSCA models in YAML format. Sommelier is capable of validating TOSCA models based on the definitions of the objects it recognizes.
 3. If the submitted model is valid, the <mark>ReadFile(content)</mark> function from the <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/Parser.py>Parser.py</a> script is invoked by REST-API.py. This function parses the model and creates lists containing the corresponding semantics.
 4. Following this, REST-API.py invokes two functions from <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/Converter.py>Converter.py</a> to produce the relevant Kubernetes YAML files. The first function, <mark>namespace(namespace)</mark>, generates the namespace responsible for hosting the application and sets up the necessary vhost on RabbitMQ. The second function, called <mark>Converter.tosca_to_k8s(operator_list, host_list, namespace)</mark>, retrieves lists of semantics describing operators/applications and hosts, in addition to the generated namespace. These details are utilized to deploy applications along with companion containers on the platform.
 5. Subsequently, REST-API.py repeatedly invokes the <mark>apply(data)</mark> function from <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/Kubernetes.py>Kubernetes.py</a> to deploy the generated files onto the Kubernetes cluster. The same function is being utilized to create configmaps that will configure the deployed containers to communicate with their companion container pair.
