@@ -5,7 +5,7 @@ import Host
 import Kubernetes
 from hurry.filesize import size, iec
 import subprocess
-
+import requests
 
 def convert_bytes(bytes):
     output = 0
@@ -300,3 +300,14 @@ def generate_topic(topic, application, output_topic_list, type="None", order=0):
         output_topic_list.append({"topic": topic, "order": order})
     print(str(command))
     subprocess.call([str(command)], shell=True)
+
+
+def configure_instancemanager(list):
+    sorted_list = sorted(list, key=lambda x: x["order"])
+    last_output_topic = sorted_list[-1]
+    last_output_topic.pop('order', None)
+    response = requests.post("0.0.0.0:5001/init", json=last_output_topic)
+    if response.status_code == 200:
+        print("Instancemanager is configured successfully!")
+    else:
+        print("Instancemanager is not configured, status code:", response.status_code)

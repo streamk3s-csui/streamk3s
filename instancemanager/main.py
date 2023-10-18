@@ -17,7 +17,7 @@ def process_data(data):
     print('Processing data:', data)
 
 
-@app.route('/api/data', methods=['POST'])
+@app.route('/init', methods=['POST'])
 def receive_data():
     data = request.get_json()  # Get JSON data from the POST request
     logging.getLogger().setLevel(logging.INFO)
@@ -38,4 +38,4 @@ def receive_data():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

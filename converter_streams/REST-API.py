@@ -41,6 +41,7 @@ def validate():
                 Kubernetes.apply(deploy)
                 os.system("kubectl wait --for condition=ready pods --all -n " + namespace + " --timeout=30s")
             KEDA.write_rules_config(operator_list)
+            Converter.configure_instancemanager(output_topic_list)
         else:
             logging.info("application model is not correct")
     return message
