@@ -9,10 +9,17 @@ from requests.auth import HTTPBasicAuth
 import subprocess
 from subprocess import PIPE
 
+from systemd.journal import JournalHandler
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 # from MessageThread import CustomThread
 consumer_list = []
 message_list = []
-logging.getLogger().setLevel(logging.INFO)
+log = logging.getLogger('Instancemanager consumer')
+log.addHandler(JournalHandler())
+log.setLevel(logging.INFO)
 
 
 def callback(ch, method, properties, body):
@@ -35,11 +42,11 @@ def callback(ch, method, properties, body):
     return message
 
 
-def consume_message(topic):
+def consume_message(topic, namespace):
     user = os.getenv("RABBITMQ_USERNAME", "user")
     rabbit_ip = os.getenv("POD_IP", "ip")
     password = os.getenv("RABBITMQ_PASSWORD", "password")
-    application = "experiment-ais"
+    application = namespace
     credentials = pika.PlainCredentials(user, password)
     consume_connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=rabbit_ip,

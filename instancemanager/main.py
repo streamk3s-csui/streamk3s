@@ -13,10 +13,21 @@ log = logging.getLogger('Instancemanager')
 log.addHandler(JournalHandler())
 log.setLevel(logging.INFO)
 
+
+def init_process_logging():
+    # Configure the logging handler for the current process
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+
 def process_data(data):
     # Simulate some time-consuming task
     # Replace this with your actual data processing logic
-    json_data = consume_message(data)
+    init_process_logging()
+    topic = data.get("topic")
+    logging.info(topic)
+    namespace = data.get("namespace")
+    logging.info(namespace)
+    json_data = consume_message(topic, namespace)
     namespace = json_data.get("namespace")
     pod = json_data.get("pod")
     command = "kubectl delete -n " + namespace + " pod " + pod
@@ -28,14 +39,9 @@ def process_data(data):
 @app.route('/init', methods=['POST'])
 def receive_data():
     data = request.get_json()  # Get JSON data from the POST request
-    log.info(data)
-    rabbit_input_topic = data.get("topic")
-    log.info(rabbit_input_topic)
     # Start a new process to process the data in parallel
-    process = multiprocessing.Process(target=process_data, args=(rabbit_input_topic,))
+    process = multiprocessing.Process(target=process_data, args=(data,))
     process.start()
-
-
 
     # Respond to the client immediately
     return 'Data received and processing started in a separate process.'

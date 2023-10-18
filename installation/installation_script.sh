@@ -11,6 +11,7 @@ pip install PyYAML
 pip install Flask
 pip install tosca-parser
 pip install pika
+pip install python-dotenv
 snap install helm --classic
 echo "--------------------------------------------"
 echo "RabbitMQ"

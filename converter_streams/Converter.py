@@ -6,6 +6,11 @@ import Kubernetes
 from hurry.filesize import size, iec
 import subprocess
 import requests
+from systemd.journal import JournalHandler
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def convert_bytes(bytes):
     output = 0
@@ -297,7 +302,7 @@ def generate_topic(topic, application, output_topic_list, type="None", order=0):
     command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + topic + " --data " + "'" + json.dumps(
         parameters) + "'"
     if type is not "None" and order is not 0:
-        output_topic_list.append({"topic": topic, "order": order})
+        output_topic_list.append({"topic": topic, "order": order, "namespace": application})
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
