@@ -54,6 +54,8 @@ cd ..
 cp instancemanager/.env converter_streams
 cd instancemanager
 cd ..
+mkdir /opt/Stream-Processing/
+cp -r instancemanager /opt/Stream-Processing
 cd installation
 cp instancemanager.service /etc/systemd/system/
 systemctl enable instancemanager.service
@@ -61,6 +63,9 @@ systemctl start instancemanager.service
 echo "--------------------------------------------"
 echo "Converter"
 echo "--------------------------------------------"
+cd ..
+cp -r converter_streams /opt/Stream-Processing
+cd installation
 cp converter.service /etc/systemd/system/
 systemctl enable converter.service
 systemctl start converter.service

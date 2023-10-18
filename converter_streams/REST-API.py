@@ -1,5 +1,5 @@
+from systemd.journal import JournalHandler
 import logging
-
 import os
 import shutil
 import tempfile
@@ -13,9 +13,9 @@ import Parser
 import sommelier
 
 app = Flask(__name__)
-
-logging.basicConfig(filename='std.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-logging.getLogger().setLevel(logging.INFO)
+log = logging.getLogger('Converter')
+log.addHandler(JournalHandler())
+log.setLevel(logging.INFO)
 
 
 @app.route('/submit', methods=['POST'])

@@ -306,7 +306,7 @@ def configure_instancemanager(list):
     sorted_list = sorted(list, key=lambda x: x["order"])
     last_output_topic = sorted_list[-1]
     last_output_topic.pop('order', None)
-    response = requests.post("0.0.0.0:5001/init", json=last_output_topic)
+    response = requests.post("0.0.0.0:4004/init", json=last_output_topic)
     if response.status_code == 200:
         print("Instancemanager is configured successfully!")
     else:
