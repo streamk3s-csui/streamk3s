@@ -1,9 +1,10 @@
 ## Stream-Processing
 
-Stream-Processing, functioning as a Function as a Service (FaaS) solution, empowers developers to introduce their own containerized streaming modules into our K3s cluster. This is achieved by defining communication patterns within NodeRED. NodeRED is capable of extracting fields and generating a TOSCA extension in JSON format. This extension describes the communication structure and scaling behavior of these modules. The TOSCA description is then processed by the Converter component. This component validates the TOSCA using the <a href=https://github.com/di-unipi-socc/Sommelier>TOSCA Sommelier validator</a>. If the TOSCA is deemed valid, the Converter generates corresponding Kubernetes files. It also configures RabbitMQ to facilitate communication between components via streams and sets up <a href=https://keda.sh/>KEDA</a> to implement scaling rules linked to RabbitMQ for each component.
+Stream-Processing, operating as a Function as a Service (FaaS) solution, empowers developers to integrate their own containerized streaming modules into our K3s cluster. This is accomplished by defining communication patterns within NodeRED. NodeRED has the ability to extract fields and create a TOSCA extension in JSON format, outlining the communication structure and scaling behavior of these modules. The TOSCA description is then processed by the Converter component. This component validates the TOSCA using the <a href=https://github.com/di-unipi-socc/Sommelier>TOSCA Sommelier validator</a>. If the TOSCA is found to be valid, the Converter generates corresponding Kubernetes files. It also configures RabbitMQ to facilitate communication between components via streams and sets up <a href=https://keda.sh/>KEDA</a> to implement scaling rules linked to RabbitMQ for each component. Additionally, the Instance Manager is configured by Converter, to terminate a scaled pod instance once it has completed its task.
+
 
 ## Architecture
-![alt text](Streaming%20Processing%20v2.png)
+![alt text](Streaming%20Processing%20v2.drawio.png)
 
 ## Agnostic to Programming Languages
 
