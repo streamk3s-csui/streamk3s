@@ -1,0 +1,3 @@
+## Instance Manager
+
+The Instance Manager is a service that can create processes, triggered upon request through the <mark>/init</mark> endpoint within the <mark>receive_data()</mark> function of the <a href=https://github.com/f-coda/Stream-Processing/blob/main/instancemanager/main.py>main.py</a> script, to read results from reported topics. These processes are essentially subscribers to result topics hosted on distinct vhosts. Each vhost exclusively contains a single result topic, essentially serving as the output channel for the workflow.
