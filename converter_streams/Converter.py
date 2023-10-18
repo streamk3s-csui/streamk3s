@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+
 def convert_bytes(bytes):
     output = 0
     if 'MB' in bytes:
@@ -92,7 +93,8 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                         }
                     }
                     generate_topic(input_topic, namespace_pack, output_topic_list)
-                    generate_topic(output_topic, namespace_pack, output_topic_list, "output", y.get_order())
+                    generate_topic(output_topic, namespace_pack, output_topic_list, "output", y.get_order(),
+                                   y.get_name())
                 if input_topic is not None and output_topic is None:
                     operator_configmap = {
                         "kind": "ConfigMap",
@@ -153,7 +155,8 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             "APPLICATION": namespace_pack
                         }
                     }
-                    generate_topic(output_topic, namespace_pack, output_topic_list, "output", y.get_order())
+                    generate_topic(output_topic, namespace_pack, output_topic_list, "output", y.get_order(),
+                                   y.get_name())
 
                 configmap_list.append(publish_configmap)
                 configmap_list.append(operator_configmap)
@@ -295,24 +298,24 @@ def namespace(application):
     return namespace
 
 
-def generate_topic(topic, application, output_topic_list, type="None", order=0):
+def generate_topic(topic, application, output_topic_list, type="None", order=0, operator="None"):
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     parameters = {"durable": True}
     ip = os.getenv("POD_IP", "ip")
     command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + topic + " --data " + "'" + json.dumps(
         parameters) + "'"
-    if type is not "None" and order is not 0:
-        output_topic_list.append({"topic": topic, "order": order, "namespace": application})
+    if type is not "None" and order is not 0 and operator is not "None":
+        output_topic_list.append({"topic": topic, "order": order, "namespace": application, "operator":operator})
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
 
 def configure_instancemanager(list):
     sorted_list = sorted(list, key=lambda x: x["order"])
-    last_output_topic = sorted_list[-1]
-    last_output_topic.pop('order', None)
-    response = requests.post("0.0.0.0:4004/init", json=last_output_topic)
-    if response.status_code == 200:
-        print("Instancemanager is configured successfully!")
-    else:
-        print("Instancemanager is not configured, status code:", response.status_code)
+    for json_item in sorted_list:
+        if json_item.get("scale"):
+            response = requests.post("0.0.0.0:4004/init", json=json_item)
+            if response.status_code == 200:
+                print("Instancemanager is configured successfully!")
+            else:
+                print("Instancemanager is not configured, status code:", response.status_code)
