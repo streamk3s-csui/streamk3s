@@ -32,8 +32,8 @@ def validate():
             logging.info("application model is correct")
             operator_list, host_list, namespace = Parser.ReadFile(content)
             namespace_file = Converter.namespace(namespace)
-            deployment_files, confimap_files = Converter.tosca_to_k8s(operator_list, host_list,
-                                                                                        namespace)
+            deployment_files, confimap_files, output_topic_list = Converter.tosca_to_k8s(operator_list, host_list,
+                                                                                         namespace)
             Kubernetes.apply(namespace_file)
             for configmap in confimap_files:
                 Kubernetes.apply(configmap)
