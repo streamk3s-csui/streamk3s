@@ -13,16 +13,6 @@ from subprocess import PIPE
 consumer_list = []
 message_list = []
 logging.getLogger().setLevel(logging.INFO)
-user = os.getenv("RABBITMQ_USERNAME", "name")
-rabbit_ip = os.getenv("POD_IP", "ip")
-password = os.getenv("RABBITMQ_PASSWORD", "password")
-application = "experiment-ais"
-credentials = pika.PlainCredentials(user, password)
-consume_connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host=rabbit_ip,
-                              credentials=credentials,
-                              virtual_host=application,
-                              ))
 
 
 def callback(ch, method, properties, body):
@@ -35,17 +25,27 @@ def callback(ch, method, properties, body):
     ch.basic_ack(delivery_tag=method.delivery_tag)
     namespace = data.get("namespace")
     pod = data.get("pod")
-    x = subprocess.Popen(["kubectl delete -n "+namespace+" pod "+pod],shell=True,stdout=PIPE,stderr=PIPE)
+    x = subprocess.Popen(["kubectl delete -n " + namespace + " pod " + pod], shell=True, stdout=PIPE, stderr=PIPE)
     stdout, stderr = x.communicate()
     if not "not found" in stderr.decode("utf-8"):
-    	message = "pod "+ pod+ " deleted"
+        message = "pod " + pod + " deleted"
     else:
-       message= "looking for pods"
+        message = "looking for pods"
     print(message)
     return message
 
 
 def consume_message(topic):
+    user = os.getenv("RABBITMQ_USERNAME", "user")
+    rabbit_ip = os.getenv("POD_IP", "ip")
+    password = os.getenv("RABBITMQ_PASSWORD", "password")
+    application = "experiment-ais"
+    credentials = pika.PlainCredentials(user, password)
+    consume_connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=rabbit_ip,
+                                  credentials=credentials,
+                                  virtual_host=application,
+                                  ))
     channel = consume_connection.channel()
     channel.basic_qos(prefetch_count=10)
     result = channel.basic_consume(queue=topic,
@@ -54,4 +54,3 @@ def consume_message(topic):
     print(' [*] Waiting for messages.')
     channel.start_consuming()
     return result
-

@@ -17,19 +17,7 @@ def apply(data):
     os.system("rm -r " + dirpath)
 
 
-def find_ip():
-    k3s = os.popen("kubectl get -n rabbit service mu-rabbit-rabbitmq -o json").read()
-    json_file = json.loads(k3s)
-    spec = json_file.get('spec')
-    ip = spec.get('clusterIP')
-    print(ip)
-    return ip
 
-
-def find_password():
-    k3s = os.popen(
-        "kubectl get secret mu-rabbit-rabbitmq --namespace rabbit -o jsonpath='{.data.rabbitmq-password}' | base64 --decode").read()
-    return k3s
 
 
 

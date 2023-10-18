@@ -1,4 +1,5 @@
 import json
+import os
 
 import Host
 import Kubernetes
@@ -47,8 +48,8 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                                'ephemeral-storage': kube_disk}}
 
                 operator_type = y.get_operator_type()
-                ip = Kubernetes.find_ip()
-                password = Kubernetes.find_password()
+                ip = os.getenv("POD_IP", "ip")
+                password = os.getenv("RABBITMQ_PASSWORD", "password")
                 topics = y.get_topics()
                 properties = topics.get("properties")
                 input_topic = properties.get("input_topic")
@@ -279,8 +280,9 @@ def secret_generation(json, application):
 def namespace(application):
     namespace = {'apiVersion': 'v1', 'kind': 'Namespace',
                  'metadata': {'name': application}}
-    password = Kubernetes.find_password()
-    command = 'curl -u user:' + password + ' -X PUT http://0.0.0.0:15672/api/vhosts/' + application
+    password = os.getenv("RABBITMQ_PASSWORD", "password")
+    ip = os.getenv("POD_IP", "ip")
+    command = 'curl -u user:' + password + ' -X PUT http://'+ip+':15672/api/vhosts/' + application
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
@@ -288,9 +290,10 @@ def namespace(application):
 
 
 def generate_topic(topic, application):
-    password = Kubernetes.find_password()
+    password = os.getenv("RABBITMQ_PASSWORD", "password")
     parameters = {"durable": True}
-    command = "curl -u user:" + password + " -X PUT http://0.0.0.0:15672/api/queues/" + application + "/" + topic + " --data " + "'" + json.dumps(
+    ip = os.getenv("POD_IP", "ip")
+    command = "curl -u user:" + password + " -X PUT http://"+ip+":15672/api/queues/" + application + "/" + topic + " --data " + "'" + json.dumps(
         parameters) + "'"
 
     print(str(command))
