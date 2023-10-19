@@ -18,15 +18,15 @@ log.addHandler(JournalHandler())
 log.setLevel(logging.INFO)
 
 
-def edit_instancemanager_list(operator_list, output_topic_list):
-    for topic in output_topic_list:
+def edit_instancemanager_list(operator_list, output_queue_list):
+    for queue in output_queue_list:
         for operator in operator_list:
             if operator.get_scale():
-                if topic.get("operator") == operator.get_name():
-                    topic["scale"] = True
+                if queue.get("operator") == operator.get_name():
+                    queue["scale"] = True
                 else:
-                    topic["scale"] = False
-    return output_topic_list
+                    queue["scale"] = False
+    return output_queue_list
 
 
 @app.route('/submit', methods=['POST'])
@@ -43,7 +43,7 @@ def validate():
             logging.info("application model is correct")
             operator_list, host_list, namespace = Parser.ReadFile(content)
             namespace_file = Converter.namespace(namespace)
-            deployment_files, confimap_files, output_topic_list = Converter.tosca_to_k8s(operator_list, host_list,
+            deployment_files, confimap_files, output_queue_list = Converter.tosca_to_k8s(operator_list, host_list,
                                                                                          namespace)
             Kubernetes.apply(namespace_file)
             for configmap in confimap_files:
@@ -52,8 +52,8 @@ def validate():
                 Kubernetes.apply(deploy)
                 os.system("kubectl wait --for condition=ready pods --all -n " + namespace + " --timeout=30s")
             KEDA.write_rules_config(operator_list)
-            output_topic_list = edit_instancemanager_list(operator_list, output_topic_list)
-            Converter.configure_instancemanager(output_topic_list)
+            output_queue_list = edit_instancemanager_list(operator_list, output_queue_list)
+            Converter.configure_instancemanager(output_queue_list)
         else:
             logging.info("application model is not correct")
     return message

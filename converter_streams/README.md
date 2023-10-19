@@ -20,7 +20,7 @@ Operator-1 is connected with Host-1 via host requirement. Similarly, Operator-2 
 | name          | Name of the operator                                                                                                                                    |
 | operator_type | An operator can be producer or subscriber                                                                                                               |
 | order         | The deployment order of operators                                                                                                                       |
-| topics        | Specify the topics with which the operator should establish communication. Each operator may have zero or one input_topic and zero or one output_topic. |
+| queues        | Specify the queues with which the operator should establish communication. Each operator may have zero or one input_queue and zero or one output_queue. |
 | scale         | It includes rules based on conditions supported by KEDA, which are associated with either MessageRate or QueueLength.                                   |
 | port          | It lists the ports utilized by an operator.                                                                                                             |
 | requirements  | It encompasses the host requirement linking an Operator with a Host, detailing the hardware prerequisites of the Operator.r                   |
@@ -79,9 +79,9 @@ topology_template:
         application: experiment-ais
         operator_type: producer
         order: 1
-        topics:
+        queues:
           properties:
-            output_topic: topic-1
+            output_queue: queue-1
         port:
           - 20766
       requirements:
@@ -95,14 +95,14 @@ topology_template:
         application: experiment-ais
         operator_type: subscriber
         order: 2
-        topics:
+        queues:
           properties:
-            input_topic: topic-1
-            output_topic: topic-2
+            input_queue: queue-1
+            output_queue: queue-2
         scale:
           - rule: 1
             condition: MessageRate = 16
-            input_topic: topic-1
+            input_queue: queue-1
             scale: 3
         port:
           - 20766
@@ -131,4 +131,4 @@ The code for Sommelier can be found in this <a href=https://github.com/di-unipi-
 4. Following this, REST-API.py invokes two functions from <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/Converter.py>Converter.py</a> to produce the relevant Kubernetes YAML files. The first function, `namespace(namespace)`, generates the namespace responsible for hosting the application and sets up the necessary vhost on RabbitMQ. The second function, called `Converter.tosca_to_k8s(operator_list, host_list, namespace)`, retrieves lists of semantics describing operators/applications and hosts, in addition to the generated namespace. These details are utilized to deploy applications along with companion containers on the platform.
 5. Subsequently, REST-API.py repeatedly invokes the `apply(data)` function from <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/Kubernetes.py>Kubernetes.py</a> to deploy the generated files onto the Kubernetes cluster. The same function is being utilized to create configmaps that will configure the deployed containers to communicate with their companion container pair.
 6. REST-API.py employs the `write_rules_config(operator_list)` function from the <a href=https://github.com/f-coda/Stream-Processing/blob/main/converter_streams/KEDA.py>KEDA.py</a> script. This function generates KEDA YAML files, encapsulating scale rules for the operators derived from the description provided in TOSCA models.
-7. In the final step, REST-API.py utilizes its custom function called `edit_instancemanager_list(operator_list, output_topic_list)` to determine which operators need to scale and what their corresponding output topics are. Subsequently, it executes the `configure_instancemanager(list)` function to organize the output_list. It then sends each JSON object from the list, containing the application's namespace, output topic, operator's position in the workflow, and the operator's name, to the Instancemanager. Each K3s namespace has its dedicated vhost on RabbitMQ. The Instance Manager subscribes to this vhost and monitors the reported topics, identifying the instance pod that has completed its computations. Subsequently, it terminates this specific pod.
+7. In the final step, REST-API.py utilizes its custom function called `edit_instancemanager_list(operator_list, output_queue_list)` to determine which operators need to scale and what their corresponding output queues are. Subsequently, it executes the `configure_instancemanager(list)` function to organize the output_list. It then sends each JSON object from the list, containing the application's namespace, output queue, operator's position in the workflow, and the operator's name, to the Instancemanager. Each K3s namespace has its dedicated vhost on RabbitMQ. The Instance Manager subscribes to this vhost and monitors the reported queues, identifying the instance pod that has completed its computations. Subsequently, it terminates this specific pod.

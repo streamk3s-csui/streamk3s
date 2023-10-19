@@ -45,9 +45,9 @@ topology_template:
         application: experiment-ais
         operator_type: producer
         order: 1
-        topics:
+        queues:
           properties:
-            output_topic: topic-1
+            output_queue: queue-1
         port:
           - 20766
       requirements:
@@ -61,14 +61,14 @@ topology_template:
         application: experiment-ais
         operator_type: subscriber
         order: 2
-        topics:
+        queues:
           properties:
-            input_topic: topic-1
-            output_topic: topic-2
+            input_queue: queue-1
+            output_queue: queue-2
         scale:
           - rule: 1
             condition: MessageRate = 16
-            input_topic: topic-1
+            input_queue: queue-1
             scale: 3
         port:
           - 20766

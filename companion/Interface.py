@@ -16,16 +16,16 @@ logging.getLogger().setLevel(logging.INFO)
 @app.route("/post_message", methods=["POST"])
 def post():
     json_data = flask.request.json
-    rabbit_topic = os.getenv("OUTPUT_TOPIC", "#topic")
-    publish.publish_message(json_data, rabbit_topic)
+    rabbit_queue = os.getenv("OUTPUT_QUEUE", "#queue")
+    publish.publish_message(json_data, rabbit_queue)
 
     return json_data
 
 
 @app.route("/get_message", methods=["GET"])
 def get():
-    rabbit_input_topic = os.getenv("INPUT_TOPIC", "topic-1")
-    json_data = consume.consume_message(rabbit_input_topic)
+    rabbit_input_queue = os.getenv("INPUT_QUEUE", "queue-1")
+    json_data = consume.consume_message(rabbit_input_queue)
     return json_data
 
 

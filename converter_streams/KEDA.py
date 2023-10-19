@@ -23,10 +23,10 @@ def write_rules_config(operatorlist):
                 logging.info(name)
                 condition = rule.get('condition')
                 scale_up = rule.get('scale')
-                if rule.get('output_topic'):
-                    topic = rule.get('output_topic')
-                if rule.get('input_topic'):
-                    topic = rule.get('input_topic')
+                if rule.get('output_queue'):
+                    queue = rule.get('output_queue')
+                if rule.get('input_queue'):
+                    queue = rule.get('input_queue')
                 if 'QueueLength' in condition:
                     condition_name = 'QueueLength'
                 if 'MessageRate' in condition:
@@ -39,7 +39,7 @@ def write_rules_config(operatorlist):
                                          'minReplicaCount': 1, 'maxReplicaCount': scale_up,
                                          'triggers': [
                                              {'type': 'rabbitmq',
-                                              'metadata': {'protocol': 'http', 'queueName': topic,
+                                              'metadata': {'protocol': 'http', 'queueName': queue,
                                                            'mode': condition_name,
                                                            'value': str(value)},
                                               'authenticationRef': {'name': 'keda-trigger-auth-rabbitmq-conn'}}]}}

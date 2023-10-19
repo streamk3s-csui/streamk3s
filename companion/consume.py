@@ -35,7 +35,7 @@ def callback(ch, method, properties, body):
     return json_format
 
 
-def consume_message(topic):
+def consume_message(queue):
     credentials = pika.PlainCredentials(user, password)
     consume_connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=rabbit_ip,
@@ -44,7 +44,7 @@ def consume_message(topic):
                                   ))
     channel = consume_connection.channel()
     channel.basic_qos(prefetch_count=10)
-    result = channel.basic_consume(queue=topic,
+    result = channel.basic_consume(queue=queue,
                                    auto_ack=False,
                                    on_message_callback=callback)
     logging.info(' [*] Waiting for messages.')

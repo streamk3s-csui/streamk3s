@@ -23,11 +23,11 @@ def process_data(data):
     # Simulate some time-consuming task
     # Replace this with your actual data processing logic
     init_process_logging()
-    topic = data.get("topic")
-    logging.info(topic)
+    queue = data.get("queue")
+    logging.info(queue)
     namespace = data.get("namespace")
     logging.info(namespace)
-    json_data = consume_message(topic, namespace)
+    json_data = consume_message(queue, namespace)
     namespace = json_data.get("namespace")
     pod = json_data.get("pod")
     command = "kubectl delete -n " + namespace + " pod " + pod

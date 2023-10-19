@@ -29,11 +29,11 @@ def ReadFile(json):
             image = properties.get('image')
             order = properties.get('order')
             scale = properties.get('scale')
-            topics = properties.get('topics')
+            queues = properties.get('queues')
             requirements = node.get('requirements')
             host = requirements[0].get('host')
             operator_list.append(
-                Operator(image, type, name, application, operator_type, port, arch, os, host, scale, topics, order))
+                Operator(image, type, name, application, operator_type, port, arch, os, host, scale, queues, order))
         if 'tosca.nodes.Compute' in type:
             capabilities = node.get('capabilities')
             instance = capabilities.get('host')

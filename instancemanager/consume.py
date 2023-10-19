@@ -42,7 +42,7 @@ def callback(ch, method, properties, body):
     return message
 
 
-def consume_message(topic, namespace):
+def consume_message(queue, namespace):
     user = os.getenv("RABBITMQ_USERNAME", "user")
     rabbit_ip = os.getenv("POD_IP", "ip")
     password = os.getenv("RABBITMQ_PASSWORD", "password")
@@ -55,7 +55,7 @@ def consume_message(topic, namespace):
                                   ))
     channel = consume_connection.channel()
     channel.basic_qos(prefetch_count=10)
-    result = channel.basic_consume(queue=topic,
+    result = channel.basic_consume(queue=queue,
                                    auto_ack=False,
                                    on_message_callback=callback)
     print(' [*] Waiting for messages.')

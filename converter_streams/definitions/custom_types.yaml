@@ -5,12 +5,12 @@ description: ACCORDION node types
 
 
 data_types:
-  topics:
+  queues:
     properties:
-      input_topic:
+      input_queue:
         type: string
         required: false
-      output_topic:
+      output_queue:
         type: string
         required: false
 
@@ -29,10 +29,10 @@ data_types:
         type: integer
       condition:
         type: string
-      output_topic:
+      output_queue:
         type: string
         required: false
-      input_topic:
+      input_queue:
         type: string
         required: false
       scale:
@@ -59,10 +59,10 @@ node_types:
           - valid_values: [ subscriber, producer ]
       order:
         type: integer
-      topics:
+      queues:
         type: map
         entry_schema:
-          type: topics
+          type: queues
 
       scale:
         type: list

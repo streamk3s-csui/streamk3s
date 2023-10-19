@@ -25,7 +25,7 @@ def convert_bytes(bytes):
 
 
 def tosca_to_k8s(operator_list, host_list, namespace_pack):
-    output_topic_list = []
+    output_queue_list = []
     images = []
     deployment = {}
     edge_os = ''
@@ -57,11 +57,11 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                 operator_type = y.get_operator_type()
                 ip = os.getenv("POD_IP", "ip")
                 password = os.getenv("RABBITMQ_PASSWORD", "password")
-                topics = y.get_topics()
-                properties = topics.get("properties")
-                input_topic = properties.get("input_topic")
-                output_topic = properties.get("output_topic")
-                if input_topic is not None and output_topic is not None:
+                queues = y.get_queues()
+                properties = queues.get("properties")
+                input_queue = properties.get("input_queue")
+                output_queue = properties.get("output_queue")
+                if input_queue is not None and output_queue is not None:
                     operator_configmap = {
                         "kind": "ConfigMap",
                         "apiVersion": "v1",
@@ -87,15 +87,15 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             "OPERATOR_PATH": "/post_message",
                             "RABBIT_IP": ip,
                             "RABBITMQ_PASSWORD": password,
-                            "INPUT_TOPIC": input_topic,
-                            "OUTPUT_TOPIC": output_topic,
+                            "INPUT_QUEUE": input_queue,
+                            "OUTPUT_QUEUE": output_queue,
                             "APPLICATION": namespace_pack
                         }
                     }
-                    generate_topic(input_topic, namespace_pack, output_topic_list)
-                    generate_topic(output_topic, namespace_pack, output_topic_list, "output", y.get_order(),
+                    generate_queue(input_queue, namespace_pack, output_queue_list)
+                    generate_queue(output_queue, namespace_pack, output_queue_list, "output", y.get_order(),
                                    y.get_name())
-                if input_topic is not None and output_topic is None:
+                if input_queue is not None and output_queue is None:
                     operator_configmap = {
                         "kind": "ConfigMap",
                         "apiVersion": "v1",
@@ -121,12 +121,12 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             "OPERATOR_PATH": "/post_message",
                             "RABBIT_IP": ip,
                             "RABBITMQ_PASSWORD": password,
-                            "INPUT_TOPIC": input_topic,
+                            "INPUT_QUEUE": input_queue,
                             "APPLICATION": namespace_pack
                         }
                     }
-                    generate_topic(input_topic, namespace_pack, output_topic_list)
-                if output_topic is not None and input_topic is None:
+                    generate_queue(input_queue, namespace_pack, output_queue_list)
+                if output_queue is not None and input_queue is None:
                     operator_configmap = {
                         "kind": "ConfigMap",
                         "apiVersion": "v1",
@@ -151,11 +151,11 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             "OPERATOR_PATH": "/post_message",
                             "RABBIT_IP": ip,
                             "RABBITMQ_PASSWORD": password,
-                            "OUTPUT_TOPIC": output_topic,
+                            "OUTPUT_queue": output_queue,
                             "APPLICATION": namespace_pack
                         }
                     }
-                    generate_topic(output_topic, namespace_pack, output_topic_list, "output", y.get_order(),
+                    generate_queue(output_queue, namespace_pack, output_queue_list, "output", y.get_order(),
                                    y.get_name())
 
                 configmap_list.append(publish_configmap)
@@ -271,7 +271,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             }}}
 
                     deployment_files.append(deployment)
-    return deployment_files, configmap_list, output_topic_list
+    return deployment_files, configmap_list, output_queue_list
 
 
 def secret_generation(json, application):
@@ -298,14 +298,14 @@ def namespace(application):
     return namespace
 
 
-def generate_topic(topic, application, output_topic_list, type="None", order=0, operator="None"):
+def generate_queue(queue, application, output_queue_list, type="None", order=0, operator="None"):
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     parameters = {"durable": True}
     ip = os.getenv("POD_IP", "ip")
-    command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + topic + " --data " + "'" + json.dumps(
+    command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + queue + " --data " + "'" + json.dumps(
         parameters) + "'"
     if type is not "None" and order is not 0 and operator is not "None":
-        output_topic_list.append({"topic": topic, "order": order, "namespace": application, "operator":operator})
+        output_queue_list.append({"queue": queue, "order": order, "namespace": application, "operator":operator})
     print(str(command))
     subprocess.call([str(command)], shell=True)
 

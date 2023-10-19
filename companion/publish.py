@@ -18,19 +18,19 @@ application = os.getenv("APPLICATION", "#application")
 credentials = pika.PlainCredentials(user, password)
 
 
-def publish_message(data, topic):
+def publish_message(data, queue):
     data_bytes = data.encode('utf-8')
     publish_connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=rabbit_ip,
                                   credentials=credentials,
                                   virtual_host=application))
     channel = publish_connection.channel()
-    status = channel.queue_declare(queue=topic, durable=True)
+    status = channel.queue_declare(queue=queue, durable=True)
     if status.method.message_count == 0:
         logging.info("queue empty")
 
     channel.basic_publish(exchange='',
-                          routing_key=topic,
+                          routing_key=queue,
                           body=data_bytes,
                           properties=pika.BasicProperties(
                               delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
