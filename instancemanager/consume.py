@@ -30,15 +30,19 @@ def callback(ch, method, properties, body):
     my_json = body.decode('utf8')
     data = json.loads(my_json)
     ch.basic_ack(delivery_tag=method.delivery_tag)
-    namespace = data.get("namespace")
-    pod = data.get("pod")
-    x = subprocess.Popen(["kubectl delete -n " + namespace + " pod " + pod], shell=True, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = x.communicate()
-    if not "not found" in stderr.decode("utf-8"):
-        message = "pod " + pod + " deleted"
+    if data.get("namespace") and data.get("pod") and data.get("status"):
+        if data.get("status") == "ended":
+            namespace = data.get("namespace")
+            pod = data.get("pod")
+            x = subprocess.Popen(["kubectl delete -n " + namespace + " pod " + pod], shell=True, stdout=PIPE, stderr=PIPE)
+            stdout, stderr = x.communicate()
+            if not "not found" in stderr.decode("utf-8"):
+                message = "pod " + pod + " deleted"
+            else:
+                message = "looking for pods"
+            print(message)
     else:
-        message = "looking for pods"
-    print(message)
+        message = "no operator pod has completed its processing."
     return message
 
 
