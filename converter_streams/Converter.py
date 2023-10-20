@@ -151,7 +151,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             "OPERATOR_PATH": "/post_message",
                             "RABBIT_IP": ip,
                             "RABBITMQ_PASSWORD": password,
-                            "OUTPUT_queue": output_queue,
+                            "OUTPUT_QUEUE": output_queue,
                             "APPLICATION": namespace_pack
                         }
                     }
