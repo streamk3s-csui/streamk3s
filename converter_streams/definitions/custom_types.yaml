@@ -40,10 +40,6 @@ data_types:
 
 
 node_types:
-
-
-
-
   Operator:
     derived_from: tosca.nodes.SoftwareComponent
     properties:

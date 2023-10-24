@@ -21,7 +21,7 @@ kubectl delete namespace gui
 echo "--------------------------------------------"
 echo "Stopping KEDA"
 echo "--------------------------------------------"
-kubectl delete namespace keda
+kubectl delete -f https://github.com/kedacore/keda/releases/download/v2.12.0/keda-2.12.0-core.yaml
 echo "--------------------------------------------"
 echo "Stopping RabbitMQ"
 echo "--------------------------------------------"

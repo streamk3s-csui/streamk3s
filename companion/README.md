@@ -18,7 +18,7 @@ When a new pod is deployed on our platform, it incorporates both the function co
 
 ## Build image
 ``` shell
-docker build -f Dockerfile -t publish:v2.4 .
-docker tag publish:v2.4 gkorod/publish:v2.4
-docker push gkorod/publish:v2.4
+docker build -f Dockerfile -t companion:v2.4 .
+docker tag companion:v2.4 gkorod/companion:v2.4
+docker push gkorod/companion:v2.4
 ```

@@ -19,28 +19,18 @@ def init_process_logging():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
-def process_data(data):
+def process_data(termination_list):
     # Simulate some time-consuming task
     # Replace this with your actual data processing logic
     init_process_logging()
-    queue = data.get("queue")
-    logging.info(queue)
-    namespace = data.get("namespace")
-    logging.info(namespace)
-    json_data = consume_message(queue, namespace)
-    namespace = json_data.get("namespace")
-    pod = json_data.get("pod")
-    command = "kubectl delete -n " + namespace + " pod " + pod
-    log.info(command)
-    subprocess.call(["kubectl delete -n " + namespace + " pod " + pod], shell=True)
-    log.info("pod " + pod + " deleted")
+    consume_message(termination_list)
 
 
 @app.route('/init', methods=['POST'])
 def receive_data():
-    data = request.get_json()  # Get JSON data from the POST request
+    termination_list = request.get_json()  # Get JSON data from the POST request
     # Start a new process to process the data in parallel
-    process = multiprocessing.Process(target=process_data, args=(data,))
+    process = multiprocessing.Process(target=process_data, args=(termination_list,))
     process.start()
 
     # Respond to the client immediately

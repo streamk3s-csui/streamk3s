@@ -26,6 +26,8 @@ def convert_bytes(bytes):
 
 def tosca_to_k8s(operator_list, host_list, namespace_pack):
     output_queue_list = []
+    input_queue_list = []
+    termination_queue_list = []
     images = []
     deployment = {}
     edge_os = ''
@@ -61,106 +63,13 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                 properties = queues.get("properties")
                 input_queue = properties.get("input_queue")
                 output_queue = properties.get("output_queue")
-                if input_queue is not None and output_queue is not None:
-                    operator_configmap = {
-                        "kind": "ConfigMap",
-                        "apiVersion": "v1",
-                        "metadata": {
-                            "name": "appconfig-" + str(y.get_order()),
-                            "namespace": namespace_pack
-                        },
-                        "data": {
-                            "API_PORT": "4321",
-                            "PUBLISH_PATH": "/post_message",
-                            "CONSUME_PATH": "/get_message",
-                        }
-                    }
-                    publish_configmap = {
-                        "kind": "ConfigMap",
-                        "apiVersion": "v1",
-                        "metadata": {
-                            "name": "publishconfig-" + str(y.get_order()),
-                            "namespace": namespace_pack
-                        },
-                        "data": {
-                            "OPERATOR_PORT": "4322",
-                            "OPERATOR_PATH": "/post_message",
-                            "RABBIT_IP": ip,
-                            "RABBITMQ_PASSWORD": password,
-                            "INPUT_QUEUE": input_queue,
-                            "OUTPUT_QUEUE": output_queue,
-                            "APPLICATION": namespace_pack
-                        }
-                    }
-                    generate_queue(input_queue, namespace_pack, output_queue_list)
-                    generate_queue(output_queue, namespace_pack, output_queue_list, "output", y.get_order(),
-                                   y.get_name())
-                if input_queue is not None and output_queue is None:
-                    operator_configmap = {
-                        "kind": "ConfigMap",
-                        "apiVersion": "v1",
-                        "metadata": {
-                            "name": "appconfig-" + str(y.get_order()),
-                            "namespace": namespace_pack
-                        },
-                        "data": {
-                            "API_PORT": "4321",
-                            "CONSUME_PATH": "/get_message",
-
-                        }
-                    }
-                    publish_configmap = {
-                        "kind": "ConfigMap",
-                        "apiVersion": "v1",
-                        "metadata": {
-                            "name": "publishconfig-" + str(y.get_order()),
-                            "namespace": namespace_pack
-                        },
-                        "data": {
-                            "OPERATOR_PORT": "4322",
-                            "OPERATOR_PATH": "/post_message",
-                            "RABBIT_IP": ip,
-                            "RABBITMQ_PASSWORD": password,
-                            "INPUT_QUEUE": input_queue,
-                            "APPLICATION": namespace_pack
-                        }
-                    }
-                    generate_queue(input_queue, namespace_pack, output_queue_list)
-                if output_queue is not None and input_queue is None:
-                    operator_configmap = {
-                        "kind": "ConfigMap",
-                        "apiVersion": "v1",
-                        "metadata": {
-                            "name": "appconfig-" + str(y.get_order()),
-                            "namespace": namespace_pack
-                        },
-                        "data": {
-                            "API_PORT": "4321",
-                            "PUBLISH_PATH": "/post_message",
-                        }
-                    }
-                    publish_configmap = {
-                        "kind": "ConfigMap",
-                        "apiVersion": "v1",
-                        "metadata": {
-                            "name": "publishconfig-" + str(y.get_order()),
-                            "namespace": namespace_pack
-                        },
-                        "data": {
-                            "OPERATOR_PORT": "4322",
-                            "OPERATOR_PATH": "/post_message",
-                            "RABBIT_IP": ip,
-                            "RABBITMQ_PASSWORD": password,
-                            "OUTPUT_QUEUE": output_queue,
-                            "APPLICATION": namespace_pack
-                        }
-                    }
-                    generate_queue(output_queue, namespace_pack, output_queue_list, "output", y.get_order(),
-                                   y.get_name())
-
-                configmap_list.append(publish_configmap)
-                configmap_list.append(operator_configmap)
-
+                order = y.get_order()
+                scale = properties.get("scale")
+                name = y.get_name()
+                configmap_list = generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password,
+                                                     output_queue_list,
+                                                     input_queue_list, name, configmap_list, scale,
+                                                     termination_queue_list)
                 ports = y.get_port()
                 if isinstance(ports, str):
                     content = {'containerPort': int(ports), 'name': y.get_name()}
@@ -271,7 +180,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                             }}}
 
                     deployment_files.append(deployment)
-    return deployment_files, configmap_list, output_queue_list
+    return deployment_files, configmap_list, termination_queue_list
 
 
 def secret_generation(json, application):
@@ -298,24 +207,182 @@ def namespace(application):
     return namespace
 
 
-def generate_queue(queue, application, output_queue_list, type="None", order=0, operator="None"):
+def generate_queue(queue, application, queue_list, type="None", order=0, operator="None"):
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     parameters = {"durable": True}
     ip = os.getenv("POD_IP", "ip")
-    command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + queue + " --data " + "'" + json.dumps(
-        parameters) + "'"
-    if type is not "None" and order is not 0 and operator is not "None":
-        output_queue_list.append({"queue": queue, "order": order, "namespace": application, "operator":operator})
-    print(str(command))
-    subprocess.call([str(command)], shell=True)
+    if queue != "termination-queue":
+        command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + queue + " --data " + "'" + json.dumps(
+            parameters) + "'"
+        if type is not "None" and order is not 0 and operator is not "None":
+            queue_list.append({"queue": queue, "order": order, "namespace": application, "operator": operator})
+        print(str(command))
+        subprocess.call([str(command)], shell=True)
+    if queue == "termination-queue":
+        command1 = "curl -u user:" + password + " http://" + ip + ":15672/api/queues/" + application + "/" + "'"
+        print(str(command1))
+        queues = subprocess.check_output(command1, stderr=subprocess.STDOUT, text=True)
+        termination_queue_found = False
+        for queue in queues:
+            if queue == "termination-queue":
+                termination_queue_found = True
+        if not termination_queue_found:
+            command = "curl -u user:" + password + " -X PUT http://" + ip + ":15672/api/queues/" + application + "/" + queue + " --data " + "'" + json.dumps(
+                parameters) + "'"
+            if type is not "None" and order is not 0 and operator is not "None":
+                queue_list.append({"queue": queue, "order": order, "namespace": application, "operator": operator})
+            print(str(command))
+            subprocess.call([str(command)], shell=True)
 
 
-def configure_instancemanager(list):
-    sorted_list = sorted(list, key=lambda x: x["order"])
-    for json_item in sorted_list:
-        if json_item.get("scale"):
-            response = requests.post("0.0.0.0:4004/init", json=json_item)
-            if response.status_code == 200:
-                print("Instancemanager is configured successfully!")
-            else:
-                print("Instancemanager is not configured, status code:", response.status_code)
+def configure_instancemanager(termination_list):
+    response = requests.post("http://0.0.0.0:4004/init", json=termination_list)
+    if response.status_code == 200:
+        print("Instancemanager is configured successfully!")
+    else:
+        print("Instancemanager is not configured, status code:", response.status_code)
+
+
+def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password, output_queue_list,
+                        input_queue_list, name, configmap_list, scale, termination_queue_list):
+    if input_queue is not None and output_queue is not None:
+        operator_configmap = {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "appconfig-" + str(order),
+                "namespace": namespace_pack
+            },
+            "data": {
+                "API_PORT": "4321",
+                "PUBLISH_PATH": "/post_message",
+                "CONSUME_PATH": "/get_message",
+            }
+        }
+        if scale is None:
+            publish_configmap = {
+                "kind": "ConfigMap",
+                "apiVersion": "v1",
+                "metadata": {
+                    "name": "publishconfig-" + str(order),
+                    "namespace": namespace_pack
+                },
+                "data": {
+                    "OPERATOR_PORT": "4322",
+                    "OPERATOR_PATH": "/post_message",
+                    "RABBIT_IP": ip,
+                    "RABBITMQ_PASSWORD": password,
+                    "INPUT_QUEUE": input_queue,
+                    "OUTPUT_QUEUE": output_queue,
+                    "APPLICATION": namespace_pack
+                }
+            }
+        if scale is not None:
+            publish_configmap = {
+                "kind": "ConfigMap",
+                "apiVersion": "v1",
+                "metadata": {
+                    "name": "publishconfig-" + str(order),
+                    "namespace": namespace_pack
+                },
+                "data": {
+                    "OPERATOR_PORT": "4322",
+                    "OPERATOR_PATH": "/post_message",
+                    "RABBIT_IP": ip,
+                    "RABBITMQ_PASSWORD": password,
+                    "INPUT_QUEUE": input_queue,
+                    "OUTPUT_QUEUE": output_queue,
+                    "TERMINATION_QUEUE": "termination-queue",
+                    "APPLICATION": namespace_pack
+                }
+
+            }
+            generate_queue("termination-queue", namespace_pack, termination_queue_list)
+        generate_queue(input_queue, namespace_pack, input_queue_list)
+        generate_queue(output_queue, namespace_pack, output_queue_list, "output", order,
+                       name)
+    if input_queue is not None and output_queue is None:
+        operator_configmap = {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "appconfig-" + str(order),
+                "namespace": namespace_pack
+            },
+            "data": {
+                "API_PORT": "4321",
+                "CONSUME_PATH": "/get_message",
+
+            }
+        }
+        publish_configmap = {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "publishconfig-" + str(order),
+                "namespace": namespace_pack
+            },
+            "data": {
+                "OPERATOR_PORT": "4322",
+                "OPERATOR_PATH": "/post_message",
+                "RABBIT_IP": ip,
+                "RABBITMQ_PASSWORD": password,
+                "INPUT_QUEUE": input_queue,
+                "APPLICATION": namespace_pack
+            }
+        }
+        generate_queue(input_queue, namespace_pack, input_queue_list)
+    if output_queue is not None and input_queue is None:
+        operator_configmap = {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "appconfig-" + str(order),
+                "namespace": namespace_pack
+            },
+            "data": {
+                "API_PORT": "4321",
+                "PUBLISH_PATH": "/post_message",
+            }
+        }
+        if scale is None:
+            publish_configmap = {
+                "kind": "ConfigMap",
+                "apiVersion": "v1",
+                "metadata": {
+                    "name": "publishconfig-" + str(order),
+                    "namespace": namespace_pack
+                },
+                "data": {
+                    "OPERATOR_PORT": "4322",
+                    "OPERATOR_PATH": "/post_message",
+                    "RABBIT_IP": ip,
+                    "RABBITMQ_PASSWORD": password,
+                    "OUTPUT_QUEUE": output_queue,
+                    "APPLICATION": namespace_pack
+                }
+            }
+        if scale is not None:
+            publish_configmap = {
+                "kind": "ConfigMap",
+                "apiVersion": "v1",
+                "metadata": {
+                    "name": "publishconfig-" + str(order),
+                    "namespace": namespace_pack
+                },
+                "data": {
+                    "OPERATOR_PORT": "4322",
+                    "OPERATOR_PATH": "/post_message",
+                    "RABBIT_IP": ip,
+                    "RABBITMQ_PASSWORD": password,
+                    "OUTPUT_QUEUE": output_queue,
+                    "TERMINATION_QUEUE": "termination-queue",
+                    "APPLICATION": namespace_pack
+                }
+            }
+            generate_queue("termination-queue", namespace_pack, termination_queue_list)
+        generate_queue(output_queue, namespace_pack, output_queue_list, "output", order,
+                       name)
+    configmap_list.append(publish_configmap)
+    configmap_list.append(operator_configmap)
+    return configmap_list

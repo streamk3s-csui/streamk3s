@@ -45,7 +45,7 @@ def write_rules_config(operatorlist):
                                               'authenticationRef': {'name': 'keda-trigger-auth-rabbitmq-conn'}}]}}
                 logging.info(scale_object)
                 Kubernetes.apply(scale_object)
-            password = Kubernetes.find_password()
+            password = os.getenv("RABBITMQ_PASSWORD", "password")
             username = 'user'
             uri = 'http://' + username + ":" + password + "@10.100.59.176:15672/" + namespace
 
