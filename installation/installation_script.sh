@@ -8,13 +8,13 @@ apt update
 apt install snapd
 apt-get install python3.6
 apt install python3-pip
-pip install oyaml
-pip install hurry.filesize
-pip install PyYAML
-pip install Flask
-pip install tosca-parser
-pip install pika
-pip install python-dotenv
+pip3 install oyaml
+pip3 install hurry.filesize
+pip3 install PyYAML
+pip3 install Flask
+pip3 install tosca-parser
+pip3 install pika
+pip3 install python-dotenv
 snap install helm --classic
 echo "--------------------------------------------"
 echo "RabbitMQ"
