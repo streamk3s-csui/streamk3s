@@ -46,11 +46,12 @@ def callback(ch, method, properties, body):
     return message
 
 
-def consume_message(queue, namespace):
+def consume_message(termination_message):
+    queue = termination_message.get("queue")
     user = os.getenv("RABBITMQ_USERNAME", "user")
     rabbit_ip = os.getenv("POD_IP", "ip")
     password = os.getenv("RABBITMQ_PASSWORD", "password")
-    application = namespace
+    application = termination_message.get("namespace")
     credentials = pika.PlainCredentials(user, password)
     consume_connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=rabbit_ip,

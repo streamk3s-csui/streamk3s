@@ -16,12 +16,15 @@ termination = os.getenv("TERMINATION_QUEUE", "#termination")
 
 @app.route("/post_message", methods=["POST"])
 def post():
-    json_data = flask.request.json
-    if json_data.get("status") and termination:
-        publish.publish_message(json_data,termination)
+    json_string = flask.request.json
+    json_data = json.loads(json_string)
+    if json_data.get("status") and termination is not None:
+        logging.info(json_string)
+        publish.publish_message(json_string, termination)
     if json_data.get("status") is None:
+        logging.info(json_string)
         rabbit_queue = os.getenv("OUTPUT_QUEUE", "#queue")
-        publish.publish_message(json_data, rabbit_queue)
+        publish.publish_message(json_string, rabbit_queue)
 
     return json_data
 

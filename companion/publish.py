@@ -7,7 +7,7 @@ import pika
 import requests
 from requests.auth import HTTPBasicAuth
 
-#from MessageThread import CustomThread
+# from MessageThread import CustomThread
 
 message_list = []
 logging.getLogger().setLevel(logging.INFO)
@@ -15,11 +15,12 @@ rabbit_ip = os.getenv("RABBIT_IP", "10.100.59.176")
 user = 'user'
 password = os.getenv("RABBITMQ_PASSWORD", "o1mB8moVLo")
 application = os.getenv("APPLICATION", "#application")
-credentials = pika.PlainCredentials(user, password)
+
 
 
 def publish_message(data, queue):
     data_bytes = data.encode('utf-8')
+    credentials = pika.PlainCredentials(user, password)
     publish_connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=rabbit_ip,
                                   credentials=credentials,

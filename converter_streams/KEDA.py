@@ -46,8 +46,9 @@ def write_rules_config(operatorlist):
                 logging.info(scale_object)
                 Kubernetes.apply(scale_object)
             password = os.getenv("RABBITMQ_PASSWORD", "password")
+            ip = os.getenv("POD_IP", "ip")
             username = 'user'
-            uri = 'http://' + username + ":" + password + "@10.100.59.176:15672/" + namespace
+            uri = 'http://' + username + ":" + password + "@"+ip+"15672/" + namespace
 
             uri_bytes = uri.encode('ascii')
             base64_uri = base64.b64encode(uri_bytes)

@@ -32,7 +32,7 @@ def validate():
             logging.info("application model is correct")
             operator_list, host_list, namespace = Parser.ReadFile(content)
             namespace_file = Converter.namespace(namespace)
-            deployment_files, confimap_files, termination_queue_list = Converter.tosca_to_k8s(
+            deployment_files, confimap_files = Converter.tosca_to_k8s(
                 operator_list, host_list,
                 namespace)
             Kubernetes.apply(namespace_file)
@@ -42,8 +42,7 @@ def validate():
                 Kubernetes.apply(deploy)
                 os.system("kubectl wait --for condition=ready pods --all -n " + namespace + " --timeout=30s")
             KEDA.write_rules_config(operator_list)
-            if termination_queue_list is not None:
-                Converter.configure_instancemanager(termination_queue_list)
+            Converter.configure_instancemanager({"queue": "termination-queue", "namespace": namespace})
         else:
             logging.info("application model is not correct")
     return message
