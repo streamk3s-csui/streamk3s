@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nodered
-  namespace: gui  # Specify the namespace here
+  namespace: gui
 spec:
   replicas: 1
   selector:
@@ -20,5 +20,12 @@ spec:
         - containerPort: 1880
         stdin: true
         tty: true
-        resources: {}  # You can specify resource limits and requests here if needed
-      restartPolicy: Always  # This ensures the container restarts unless explicitly stopped
+        resources: {}
+        volumeMounts:
+        - name: nodered-storage
+          mountPath: "/data"  # Mount path inside the container
+      volumes:
+      - name: nodered-storage
+        persistentVolumeClaim:
+          claimName: nodered-pvc
+

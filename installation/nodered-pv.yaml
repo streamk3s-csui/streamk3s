@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nodered-pv
+spec:
+  capacity:
+    storage: 1Gi  # Specify the desired storage size
+  accessModes:
+    - ReadWriteOnce  # This allows the volume to be mounted as read-write by a single node
+  hostPath:
+    path: "/opt/NodeRED"  # Path to the folder on the host machine
+

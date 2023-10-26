@@ -17,7 +17,10 @@ rm -r /opt/Stream-Processing/
 echo "--------------------------------------------"
 echo "Stopping NodeRED"
 echo "--------------------------------------------"
-kubectl delete namespace gui
+kubectl delete -f nodered-deployment.yaml
+kubectl delete -f nodered-pvc.yaml
+kubectl delete -f nodered-pv.yaml
+kubectl delete -f nodered-namespace.yaml
 echo "--------------------------------------------"
 echo "Stopping KEDA"
 echo "--------------------------------------------"

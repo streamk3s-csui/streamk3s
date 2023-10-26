@@ -31,10 +31,16 @@ kubectl expose -n rabbit pod mu-rabbit-rabbitmq-0 --port=15672 --target-port=156
 echo "--------------------------------------------"
 echo "NodeRED"
 echo "--------------------------------------------"
+mkdir /opt/NodeRED
 kubectl apply -f nodered-namespace.yaml
+kubectl apply -f nodered-pv.yaml
+kubectl apply -f nodered-pvc.yaml
 kubectl apply -f nodered-deployment.yaml
-kubectl wait --namespace gui --for condition=ready pod/nodered --timeout=120s
-nodered_ip=$(kubectl get pod nodered -n gui -o jsonpath='{.status.podIP}')
+name=$(kubectl get pods -n gui -o jsonpath='{.items[0].metadata.name}')
+kubectl wait --namespace gui --for condition=ready pod/$name --timeout=120s
+kubectl expose -n gui pod  $name --port=1880 --target-port=1880 --name=loadbalancer --type=LoadBalancer
+nodered_ip=$(kubectl get pod $name -n gui -o jsonpath='{.status.podIP}')
+sleep 60
 curl -X PUT -H "Content-type: application/json" --data-binary "@main-subflow.json" "http://${nodered_ip}:1880/flow/global"
 echo "--------------------------------------------"
 echo "KEDA"
