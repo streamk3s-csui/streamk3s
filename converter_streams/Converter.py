@@ -88,7 +88,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                                         {
                                             "name": "companion-container",
                                             "image": "gkorod/companion:v2.4",
-                                            "imagePullPolicy": "Always",
+                                            "imagePullPolicy": "IfNotPresent",
                                             "env": [
                                                 {
                                                     "name": "MY_POD_IP",
@@ -123,7 +123,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                                             "name": y.get_name(),
                                             'resources': resource_yaml,
                                             "image": y.get_image(),
-                                            "imagePullPolicy": "Always",
+                                            "imagePullPolicy": "IfNotPresent",
                                             "env": [
                                                 {
                                                     "name": "MY_POD_IP",

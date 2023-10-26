@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mynodered
+  name: nodered
   namespace: gui  # Specify the namespace here
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mynodered
+      app: nodered
   template:
     metadata:
       labels:
-        app: mynodered
+        app: nodered
     spec:
       containers:
-      - name: mynodered
+      - name: nodered
         image: nodered/node-red
         ports:
         - containerPort: 1880

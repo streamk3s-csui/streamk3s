@@ -1,0 +1,299 @@
+[
+    {
+        "id": "3e991c1d8aecc74d",
+        "type": "subflow",
+        "name": "Main node",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 420,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "2a2eae9c983934da"
+                    },
+                    {
+                        "id": "7a2971c717c0d64d"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 700,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "2a2eae9c983934da",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "name",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Name"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Resources"
+                    },
+                    "type": "none"
+                }
+            },
+            {
+                "name": "cores",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Cores"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "ram",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Ram"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "hdd",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Disk space"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Settings"
+                    },
+                    "type": "none"
+                }
+            },
+            {
+                "name": "image",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Image"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "namespace",
+                "type": "str",
+                "value": "default",
+                "ui": {
+                    "label": {
+                        "en-US": "Namespace"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "type",
+                "type": "str",
+                "value": "producer",
+                "ui": {
+                    "label": {
+                        "en-US": "Type"
+                    },
+                    "type": "select",
+                    "opts": {
+                        "opts": [
+                            {
+                                "l": {
+                                    "en-US": "Producer"
+                                },
+                                "v": "producer"
+                            },
+                            {
+                                "l": {
+                                    "en-US": "Subscriber"
+                                },
+                                "v": "subscriber"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "qlength",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Queue length"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "qscale",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Scale (Queue)"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "mrate",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Message rate"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "rscale",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Scale (Rate)"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "2a2eae9c983934da",
+        "type": "function",
+        "z": "3e991c1d8aecc74d",
+        "name": "",
+        "func": "var nodeName = env.get(\"name\");\nvar hostName = nodeName+'-host';\nvar appName = nodeName+'-app';\nvar podName = nodeName+'-pod';\n\nvar cores = env.get(\"cores\");\nvar ram = env.get(\"ram\");\nvar hdd = env.get(\"hdd\");\n\nvar image = env.get(\"image\");\nvar namespace = env.get(\"namespace\");\nvar type = env.get(\"type\");\nvar qlength = env.get(\"qlength\");\nvar qscale = env.get(\"qscale\");\nvar mrate = env.get(\"mrate\");\nvar rscale = env.get(\"rscale\");\n\nvar nodeOrder = ++msg.nodeorder;\nmsg.nodeorder = nodeOrder;\n\nvar inputQueue = namespace+'/'+nodeOrder;\nvar outputQueue = namespace+'/'+(++nodeOrder);\n\nvar hostArray = msg.hostarray;\nvar appArray = msg.apparray;\n\nvar hostTemplate = {\n        \"type\": \"tosca.nodes.Compute\",\n        \"capabilities\": {\n          \"host\": {\n            \"properties\": {\n              \"num_cpus\": cores,\n              \"mem_size\": ram,\n              \"disk_size\": hdd\n            }\n          },\n          \"os\": {\n            \"properties\": {\n              \"architecture\": \"x86_64\",\n              \"type\": \"linux\"\n            }\n          }\n        }\n      };\n      \nvar appTemplate = {\n        \"type\": \"Operator\",\n        \"properties\": {\n          \"image\": image,\n          \"name\": podName,\n          \"application\": namespace,\n          \"operator_type\": type,\n          \"order\": nodeOrder,\n          \"queues\": {\n            \"properties\": {\n              \"input_queue\": inputQueue,\n              \"output_queue\": outputQueue,\n            }\n          },\n          \"scale\": [],\n          \"port\": [\n            20766\n          ]\n        },\n        \"requirements\": [\n          {\n            \"host\": hostName\n          }\n        ]\n      };\n\nvar scaleCounter = 0;\nnode.warn(scaleCounter);\nif ((qlength > 0) && (qscale > 0)) {\n    appTemplate.properties.scale[scaleCounter] = {\n              \"rule\": scaleCounter+1,\n              \"condition\": \"QueueLength > \"+qlength,\n              \"input_queue\": inputQueue,\n              \"scale\": qscale\n            }\n    scaleCounter++;\n}\nnode.warn(scaleCounter);\nif ((mrate > 0) && (rscale > 0)) {\n    appTemplate.properties.scale[scaleCounter] = {\n              \"rule\": scaleCounter+1,\n              \"condition\": \"MessageRate > \"+mrate,\n              \"input_queue\": inputQueue,\n              \"scale\": rscale\n            }\n    scaleCounter++;\n}\nnode.warn(scaleCounter);\n//msg.payload.topology_template.node_templates[hostName]=hostTemplate;\n//msg.payload.topology_template.node_templates[appName]=appTemplate;\nhostArray.push([hostName,hostTemplate]);\nappArray.push([appName,appTemplate]);\nmsg.hostarray = hostArray;\nmsg.apparray = appArray;\nif (appTemplate.properties.scale.length > 0) {\n    node.warn(\"Sending template to next node!\");\n    return msg;   \n} else {\n    node.warn(\"Please check again, Queue length, Queue scale, Message rate, Rate scale! Halting execution!\")\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 100,
+        "wires": [
+            [
+                "73308f822e1c15a3"
+            ]
+        ]
+    },
+    {
+        "id": "73308f822e1c15a3",
+        "type": "debug",
+        "z": "3e991c1d8aecc74d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "7a2971c717c0d64d",
+        "type": "debug",
+        "z": "3e991c1d8aecc74d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 260,
+        "wires": []
+    }
+]

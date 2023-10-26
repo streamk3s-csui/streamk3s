@@ -33,6 +33,9 @@ echo "NodeRED"
 echo "--------------------------------------------"
 kubectl apply -f nodered-namespace.yaml
 kubectl apply -f nodered-deployment.yaml
+kubectl wait --namespace gui --for condition=ready pod/nodered --timeout=120s
+nodered_ip=$(kubectl get pod nodered -n gui -o jsonpath='{.status.podIP}')
+curl -X PUT -H "Content-type: application/json" --data-binary "@main-subflow.json" "http://${nodered_ip}:1880/flow/global"
 echo "--------------------------------------------"
 echo "KEDA"
 echo "--------------------------------------------"
