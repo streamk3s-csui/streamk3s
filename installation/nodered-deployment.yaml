@@ -23,7 +23,7 @@ spec:
         resources: {}
         volumeMounts:
         - name: nodered-storage
-          mountPath: "/data"  # Mount path inside the container
+          mountPath: /data  # Mount path inside the container
       volumes:
       - name: nodered-storage
         persistentVolumeClaim:
