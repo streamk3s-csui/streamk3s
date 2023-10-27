@@ -4,7 +4,7 @@ Stream-Processing, operating as a Function as a Service (FaaS) solution, empower
 
 
 ## Architecture
-![alt text](Streaming%20Processing%20v3.drawio.png)
+![alt text](Stream%20Processing%20v4.drawio.png)
 
 ## Agnostic to Programming Languages
 

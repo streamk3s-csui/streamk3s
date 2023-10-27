@@ -14,7 +14,8 @@ pod_ip = os.getenv("MY_POD_IP", "192.168.1.2")
 api_port = os.getenv("API_PORT", "4321")
 publish_path = os.getenv("PUBLISH_PATH", "/post_message")
 consume_path = os.getenv("CONSUME_PATH", "/get_message")
-
+pod_name = os.getenv("MY_POD_NAME", "#name")
+namespace = os.getenv("MY_POD_NAMESPACE", "#namespace")
 
 def send(message):
     ip = 'http://' + pod_ip + ':' + api_port + publish_path

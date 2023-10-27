@@ -18,7 +18,7 @@ termination = os.getenv("TERMINATION_QUEUE", "#termination")
 def post():
     json_string = flask.request.json
     json_data = json.loads(json_string)
-    if json_data.get("status") and termination is not None:
+    if json_data.get("status") and termination!="#termination":
         logging.info(json_string)
         publish.publish_message(json_string, termination)
     if json_data.get("status") is None:

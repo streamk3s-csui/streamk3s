@@ -3,6 +3,7 @@
 The companion container facilitates message transmission and reception through two HTTP endpoints, leveraging the RabbitMQ broker:
 * `/post_message`: This method invokes the `publish_message(data,queue)` function from the 
 <a href=https://github.com/f-coda/Stream-Processing/blob/main/companion/publish.py>publish.py</a> script to send a message to the specified queue.
+This method verifies whether the JSON message is intended for an output queue specified in the TOSCA model or if it should be dispatched to the termination queue. If the JSON message includes the status key, it indicates that it should be sent to the termination queue.
 * `/get_message`: This method calls the `consume_message(queue)` function from the 
 <a href=https://github.com/f-coda/Stream-Processing/blob/main/companion/consume.py>consumer.py</a> script to prefetch 10 messages from the designated queue. It then sends these messages back to the operator one by one.
 
