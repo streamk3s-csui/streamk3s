@@ -102,7 +102,8 @@ def handle_request(dict_from_string):
         ais_manipulator.compression_procedure(message_list)
         logging.info('compression ended')
         dummy_operator.send(
-            {'pod': pod_name, 'namespace': namespace, 'messages': len(message_list), 'status': 'compression ended'})
+            {'pod': pod_name, 'namespace': namespace 'status': 'compression ended'})
+        dummy_operator.send({'pod':pod_name,'operation': 'compressed ' + str(len(message_list)) + " messages"})
         message_list.clear()
         time.sleep(200)
 
