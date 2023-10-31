@@ -1,5 +1,119 @@
-[
+{
+   "id":"global",
+   "configs":[
+      
+   ],
+   "subflows":[
+   {
+        "id": "df0111361dbaa82d",
+        "type": "subflow",
+        "name": "Init node",
+        "info": "",
+        "category": "",
+        "in": [],
+        "out": [
+            {
+                "x": 560,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "f752c203416cb91d",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "Global settings",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "type": "none"
+                }
+            },
+            {
+                "name": "platform",
+                "type": "str",
+                "value": "localhost:1880/platform",
+                "ui": {
+                    "label": {
+                        "en-US": "Platform server"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
     {
+        "id": "f752c203416cb91d",
+        "type": "function",
+        "z": "df0111361dbaa82d",
+        "name": "",
+        "func": "var platformUrl = env.get(\"platform\");\nvar templateHeader;\nvar nodeOrder = 0;\nvar hostArray = [];\nvar appArray = [];\n\ntemplateHeader = {\n  \"tosca_definitions_version\": \"tosca_simple_yaml_1_2\",\n  \"description\": \"Application model of ORBK Use Case\",\n  \"imports\": [\n    \"definitions/custom_types.yaml\"\n  ],\n  \"topology_template\": {\n    \"node_templates\": {\n    }\n  }\n};\nmsg.payload = templateHeader;\nmsg.url = platformUrl;\nmsg.nodeorder = nodeOrder;\nmsg.hostarray = hostArray;\nmsg.apparray = appArray;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 100,
+        "wires": [
+            [
+                "4724c530ece3f15d"
+            ]
+        ]
+    },
+    {
+        "id": "1b59566d3663b7b4",
+        "type": "inject",
+        "z": "df0111361dbaa82d",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 100,
+        "wires": [
+            [
+                "f752c203416cb91d"
+            ]
+        ]
+    },
+    {
+        "id": "4724c530ece3f15d",
+        "type": "debug",
+        "z": "df0111361dbaa82d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "url",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 180,
+        "wires": []
+    },
+	{
         "id": "3e991c1d8aecc74d",
         "type": "subflow",
         "name": "Main node",
@@ -295,5 +409,122 @@
         "x": 570,
         "y": 260,
         "wires": []
+    },
+	{
+        "id": "5ab7469e11752770",
+        "type": "subflow",
+        "name": "Final node",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "3c47b82b691621f0"
+                    },
+                    {
+                        "id": "47b6817e47cc2ba6"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "f5fc8f0c4098edb4",
+        "type": "http request",
+        "z": "5ab7469e11752770",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "query",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "senderr": false,
+        "x": 450,
+        "y": 80,
+        "wires": [
+            [
+                "c36d87f9022d07a3"
+            ]
+        ]
+    },
+    {
+        "id": "c36d87f9022d07a3",
+        "type": "debug",
+        "z": "5ab7469e11752770",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "3c47b82b691621f0",
+        "type": "debug",
+        "z": "5ab7469e11752770",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 210,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "47b6817e47cc2ba6",
+        "type": "function",
+        "z": "5ab7469e11752770",
+        "name": "",
+        "func": "var hostArray = msg.hostarray;\nvar appArray = msg.apparray;\nfor (i = 0; i < hostArray.length; i++) {\n  msg.payload.topology_template.node_templates[hostArray[i][0]]=hostArray[i][1];\n} \nfor (i = 0; i < hostArray.length; i++) {\n  msg.payload.topology_template.node_templates[appArray[i][0]]=appArray[i][1];\n}\ndelete msg.hostarray;\ndelete msg.apparray;\ndelete msg.nodeorder;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 80,
+        "wires": [
+            [
+                "f5fc8f0c4098edb4",
+                "177d7b5f942691ed"
+            ]
+        ]
+    },
+    {
+        "id": "177d7b5f942691ed",
+        "type": "debug",
+        "z": "5ab7469e11752770",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 200,
+        "wires": []
     }
-]
+   ]
+}
