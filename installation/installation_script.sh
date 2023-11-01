@@ -41,7 +41,7 @@ kubectl wait --namespace gui --for condition=ready pod/$name --timeout=120s
 kubectl expose -n gui pod  $name --port=1880 --target-port=1880 --name=loadbalancer --type=LoadBalancer
 nodered_ip=$(kubectl get pod $name -n gui -o jsonpath='{.status.podIP}')
 sleep 60
-curl -X POST -H "Content-type: application/json" --data-binary "@main-subflow.json" "http://${nodered_ip}:1880/flows/"
+curl -XPUT -H "Content-type: application/json" --data-binary "@main-subflow.json" "http://${nodered_ip}:1880/flow/global"
 echo "--------------------------------------------"
 echo "KEDA"
 echo "--------------------------------------------"
