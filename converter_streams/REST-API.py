@@ -26,6 +26,13 @@ def validate():
     yaml.dump(content, ff, allow_unicode=True, sort_keys=False)
     ff.close()
     if os.path.exists(dirpath + '/application_model.yaml'):
+        with open(dirpath + '/application_model.yaml', 'r') as file:
+             tosca_yaml = yaml.safe_load(file)
+        current_imports = tosca_yaml.get('imports')
+        new_imports = ["/opt/Stream-Processing/converter_streams/"+current_imports[0]]
+        tosca_yaml['imports'] = new_imports
+        with open(dirpath + '/application_model.yaml', 'w+') as file:
+             yaml.dump(tosca_yaml, file, sort_keys=False)
         message, isCorrect = sommelier.validation(dirpath + '/application_model.yaml')
         shutil.rmtree(dirpath)
         if isCorrect:
