@@ -34,7 +34,7 @@ def callback(ch, method, properties, body):
         if data.get("status") == "ended":
             namespace = data.get("namespace")
             pod = data.get("pod")
-            x = subprocess.Popen(["kubectl delete -n " + namespace + " pod " + pod], shell=True, stdout=PIPE, stderr=PIPE)
+            x = subprocess.Popen(["kubectl delete -n " + namespace + " pod " + pod +" --now"], shell=True, stdout=PIPE, stderr=PIPE)
             stdout, stderr = x.communicate()
             if not "not found" in stderr.decode("utf-8"):
                 message = "pod " + pod + " deleted"
