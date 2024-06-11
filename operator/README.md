@@ -1,6 +1,6 @@
 ## Description
 
-This dummy operator, intended for deployment in Streaming Processing, is meant to be placed within the same container as the companion container in a pod. Its sole purpose is to facilitate the exchange of messages on a RabbitMQ broker and does not involve any sophisticated operations since our primary objective is to test communication between the two containers.
+This dummy operator, intended for deployment in StreamK3s, is meant to be placed within the same container as the companion container in a pod. Its sole purpose is to facilitate the exchange of messages on a RabbitMQ broker and does not involve any sophisticated operations since our primary objective is to test communication between the two containers.
 
 ## dummy_operator.py
 This represents the main script within the example container, employing a function named `receive_connection()`. This function is crafted to establish a connection with the queue specified in the TOSCA model, enabling the retrieval of messages. The companion container's endpoint details are provided via environment variables: `MY_POD_IP`, `API_PORT`, and `CONSUME_PATH`.
