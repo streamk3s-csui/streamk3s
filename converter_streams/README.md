@@ -1,5 +1,5 @@
 ## TOSCA
-The Stream Processing platform utilizes an extension of the TOSCA open standard by OASIS to outline the deployment and scaling of applications in Kubernetes and KEDA, respectively. TOSCA, on its own, can describe application components, as well as their deployment and runtime adaptation hosts, within topologies.
+The StreamK3s platform utilizes an extension of the TOSCA open standard by OASIS to outline the deployment and scaling of applications in Kubernetes and KEDA, respectively. TOSCA, on its own, can describe application components, as well as their deployment and runtime adaptation hosts, within topologies.
 
 ### TOSCA extension
 Within this framework, two essential entities are required:
