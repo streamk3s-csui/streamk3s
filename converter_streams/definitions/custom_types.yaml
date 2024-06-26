@@ -45,18 +45,26 @@ node_types:
     properties:
       image:
         type: string
+        required: true
       name:
         type: string
+        required: true
       application:
         type: string
+        required: true
       operator_type:
         type: string
         constraints:
           - valid_values: [ subscriber, producer ]
+      persistent_volume:
+        type: boolean
+        required: true
       order:
         type: integer
+        required: true
       queues:
         type: map
+        required: true
         entry_schema:
           type: queues
 

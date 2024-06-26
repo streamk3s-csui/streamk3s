@@ -1,6 +1,6 @@
 class Operator:
 
-    def __init__(self, image, type, name, application, operator_type, port, arch, os, host, scale, queues, order):
+    def __init__(self, image, type, name, application, operator_type, port, arch, os, host, scale, queues, order, persistent_volume):
         self.image = image
         self.type = type
         self.name = name
@@ -13,7 +13,7 @@ class Operator:
         self.scale = scale
         self.queues = queues
         self.order = order
-
+        self.persistent_volume = persistent_volume
     def get_host(self):
         return self.host
 
@@ -40,3 +40,6 @@ class Operator:
 
     def get_queues(self):
         return self.queues
+
+    def get_persistent_volume(self):
+        return self.persistent_volume

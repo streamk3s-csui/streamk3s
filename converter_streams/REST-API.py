@@ -1,4 +1,4 @@
-from systemd.journal import JournalHandler
+
 import logging
 import os
 import shutil
@@ -13,9 +13,8 @@ import Parser
 import sommelier
 
 app = Flask(__name__)
-log = logging.getLogger('Converter')
-log.addHandler(JournalHandler())
-log.setLevel(logging.INFO)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 
 @app.route('/submit', methods=['POST'])
@@ -39,10 +38,13 @@ def validate():
             logging.info("application model is correct")
             operator_list, host_list, namespace = Parser.ReadFile(content)
             namespace_file = Converter.namespace(namespace)
-            deployment_files, confimap_files = Converter.tosca_to_k8s(
+            persistent_volumes, deployment_files, confimap_files = Converter.tosca_to_k8s(
                 operator_list, host_list,
                 namespace)
             Kubernetes.apply(namespace_file)
+            if persistent_volumes:
+                for pv in persistent_volumes:
+                    Kubernetes.apply(pv)
             for configmap in confimap_files:
                 Kubernetes.apply(configmap)
             for deploy in deployment_files:

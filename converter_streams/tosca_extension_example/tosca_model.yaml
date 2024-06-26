@@ -44,6 +44,7 @@ topology_template:
         name: generator
         application: experiment-ais
         operator_type: producer
+        persistent_volume: true
         order: 1
         queues:
           properties:
@@ -60,6 +61,7 @@ topology_template:
         name: grouper
         application: experiment-ais
         operator_type: subscriber
+        persistent_volume: false
         order: 2
         queues:
           properties:
