@@ -3,7 +3,7 @@ tosca_definitions_version: tosca_simple_yaml_1_2
 description: Application model for streams architecture
 
 imports:
-  - definitions/custom_types.yaml
+  - /definitions/custom_types.yaml
 
 topology_template:
 
@@ -63,6 +63,8 @@ topology_template:
         operator_type: subscriber
         persistent_volume: false
         order: 2
+        dependencies:
+          - operator_name: generator
         queues:
           properties:
             input_queue: queue-1
