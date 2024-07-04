@@ -20,18 +20,22 @@ StreamK3s solution is language-agnostic, capable of hosting microservices writte
 
 The platform's unified installation script is accessible <a href="https://github.com/f-coda/Stream-Processing/tree/main/installation">here</a>. RabbiMQ, KEDA, and NodeRED are installed as pods, while Instance Manager and Converter are deployed as Services on Linux. Prior to platform installation, a Kubernetes Cluster must be in place. The script manages all other necessary requirements automatically.
 
-## Cite
+## Cite Us
 
-@article{KORONTANIS2024101786,
-title = {StreamK3s: A K3s-Based Data Stream Processing Platform for Simplifying Pipeline Creation, Deployment, and Scaling},
-journal = {SoftwareX},
-volume = {27},
-pages = {101786},
-year = {2024},
-issn = {2352-7110},
-doi = {https://doi.org/10.1016/j.softx.2024.101786},
-url = {https://www.sciencedirect.com/science/article/pii/S2352711024001572},
-author = {Ioannis Korontanis and Antonios Makris and Alexandros Kontogiannis and Iraklis Varlamis and Konstantinos Tserpes},
-keywords = {Cloud, Edge, FaaS platform, K3s cluster},
-abstract = {In today’s technology-driven era, applications focused on data stream processing are increasingly in need of user-friendly platforms, especially with the growing popularity of serverless computing solutions. Developers seek features such as straightforward pipeline definition, component reusability, throughput-based automatic scaling, and efficient resource utilization, highlighting the demand for such capabilities. This paper introduces a platform that addresses these requirements, leveraging technologies like K3s, RabbitMQ, and KEDA. In contrast to conventional platforms, the presented solution excels through its seamless integration of adaptability and user-friendliness, surpassing fundamental capabilities. The platform’s simple self-configuration streamlines the deployment of developer-created functions, improving efficiency and guaranteeing a seamless experience. This allows developers to focus on creating functions without the burden of managing complex configurations.}
-}
+If you use the above code for your research, please cite our paper:
+
+- [StreamK3s: A K3s-Based Data Stream Processing Platform for Simplifying Pipeline Creation, Deployment, and Scaling](https://www.sciencedirect.com/science/article/pii/S2352711024001572)
+
+      @article{KORONTANIS2024101786,
+      title = {StreamK3s: A K3s-Based Data Stream Processing Platform for Simplifying Pipeline Creation, Deployment, and Scaling},
+      journal = {SoftwareX},
+      volume = {27},
+      pages = {101786},
+      year = {2024},
+      issn = {2352-7110},
+      doi = {https://doi.org/10.1016/j.softx.2024.101786},
+      url = {https://www.sciencedirect.com/science/article/pii/S2352711024001572},
+      author = {Ioannis Korontanis and Antonios Makris and Alexandros Kontogiannis and Iraklis Varlamis and Konstantinos Tserpes},
+      keywords = {Cloud, Edge, FaaS platform, K3s cluster},
+      abstract = {In today’s technology-driven era, applications focused on data stream processing are increasingly in need of user-friendly platforms, especially with the growing popularity of serverless computing solutions. Developers seek   features such as straightforward pipeline definition, component reusability, throughput-based automatic scaling, and efficient resource utilization, highlighting the demand for such capabilities. This paper introduces a platform that addresses these requirements, leveraging technologies like K3s, RabbitMQ, and KEDA. In contrast to conventional platforms, the presented solution excels through its seamless integration of adaptability and user-friendliness, surpassing fundamental capabilities. The platform’s simple self-configuration streamlines the deployment of developer-created functions, improving efficiency and guaranteeing a seamless experience. This allows developers to focus on creating functions without the burden of managing complex configurations.}
+      }
