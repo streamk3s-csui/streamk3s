@@ -83,5 +83,7 @@ cd ..
 cp -r converter_streams /opt/Stream-Processing
 cd installation
 cp converter.service /etc/systemd/system/
+cp rabbitmq_startup.sh /usr/local/bin/
+cp wait_and_run_rabbitmq.sh /usr/local/bin
 systemctl enable converter.service
 systemctl start converter.service

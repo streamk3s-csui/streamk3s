@@ -1,9 +1,11 @@
 [Unit]
 Description=Converter
-After=multi-user.target
+After=multi-user.target network.target
 [Service]
 Type=simple
 Restart=always
+EnvironmentFile=/opt/Stream-Processing/converter_streams/.env
 ExecStart=/usr/bin/python3 /opt/Stream-Processing/converter_streams/REST-API.py
+WorkingDirectory=/opt/Stream-Processing/converter_streams
 [Install]
 WantedBy=multi-user.target
