@@ -1,4 +1,3 @@
-
 import logging
 import os
 import shutil
@@ -6,6 +5,7 @@ import tempfile
 import KEDA
 import yaml
 from flask import Flask, request
+from systemd.journal import JournalHandler  # Import JournalHandler
 
 import Converter
 import Kubernetes
@@ -13,13 +13,21 @@ import Parser
 import sommelier
 
 app = Flask(__name__)
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+
+# Configure logging to use JournalHandler
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+journal_handler = JournalHandler()
+journal_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+journal_handler.setFormatter(formatter)
+logger.addHandler(journal_handler)
 
 
 @app.route('/submit', methods=['POST'])
 def validate():
     content = request.json
+    logger.info(content)
     dirpath = tempfile.mkdtemp(dir=os.getcwd())
     ff = open(dirpath + '/application_model.yaml', 'w+')
     yaml.dump(content, ff, allow_unicode=True, sort_keys=False)
@@ -28,6 +36,7 @@ def validate():
         with open(dirpath + '/application_model.yaml', 'r') as file:
              tosca_yaml = yaml.safe_load(file)
         current_imports = tosca_yaml.get('imports')
+        logger.info(current_imports)
         new_imports = ["/opt/Stream-Processing/converter_streams/"+current_imports[0]]
         tosca_yaml['imports'] = new_imports
         with open(dirpath + '/application_model.yaml', 'w+') as file:
@@ -35,7 +44,7 @@ def validate():
         message, isCorrect = sommelier.validation(dirpath + '/application_model.yaml')
         shutil.rmtree(dirpath)
         if isCorrect:
-            logging.info("application model is correct")
+            logger.info("Application model is correct")
             operator_list, host_list, namespace = Parser.ReadFile(content)
             namespace_file = Converter.namespace(namespace)
             persistent_volumes, deployment_files, confimap_files = Converter.tosca_to_k8s(
@@ -53,9 +62,10 @@ def validate():
             KEDA.write_rules_config(operator_list)
             Converter.configure_instancemanager({"queue": "termination-queue", "namespace": namespace})
         else:
-            logging.info("application model is not correct")
+            logger.info("Application model is not correct")
     return message
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='9001', debug=True)
+

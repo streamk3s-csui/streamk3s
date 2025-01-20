@@ -1,0 +1,17 @@
+[Unit]
+Description=RabbitMQ Configuration Update
+After=network.target kubelet.service
+Before=converter.service instancemanager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rabbitmq_startup.sh
+RemainAfterExit=yes
+TimeoutStartSec=300
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

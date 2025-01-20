@@ -1,9 +1,11 @@
 [Unit]
 Description=Instance Manager
-After=multi-user.target
+After=multi-user.target network.target
 [Service]
 Type=simple
 Restart=always
+EnvironmentFile=/opt/Stream-Processing/instancemanager/.env
 ExecStart=/usr/bin/python3 /opt/Stream-Processing/instancemanager/main.py
+WorkingDirectory=/opt/Stream-Processing/instancemanager
 [Install]
 WantedBy=multi-user.target
