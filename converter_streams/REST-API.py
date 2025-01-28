@@ -35,6 +35,7 @@ def validate():
     if os.path.exists(dirpath + '/application_model.yaml'):
         with open(dirpath + '/application_model.yaml', 'r') as file:
              tosca_yaml = yaml.safe_load(file)
+        print(tosca_yaml)        
         current_imports = tosca_yaml.get('imports')
         logger.info(current_imports)
         new_imports = ["/opt/Stream-Processing/converter_streams/"+current_imports[0]]
