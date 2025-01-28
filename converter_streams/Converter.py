@@ -289,8 +289,9 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                 input_queue = properties.get("input_queue")
                 output_queue = properties.get("output_queue")
                 order = y.get_order()
+                variables = y.get_variables()
 
-                configmap_list = generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password,
+                configmap_list = generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password, variables,
                                                      configmap_list)
                 ports = y.get_port()
                 i = 0
@@ -353,7 +354,7 @@ def configure_instancemanager(message_dict):
         print("Instancemanager is not configured, status code:", response.status_code)
 
 
-def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password, configmap_list):
+def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password, variables, configmap_list):
     if input_queue is not None and output_queue is not None:
         operator_configmap = {
             "kind": "ConfigMap",
@@ -453,6 +454,11 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
         }
 
         generate_queue(output_queue, namespace_pack)
+    # add custom env variables    
+    if variables:
+        for key, value in variables.items():
+            operator_configmap["data"][key] = value
+
     configmap_list.append(publish_configmap)
     configmap_list.append(operator_configmap)
 
