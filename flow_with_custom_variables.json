@@ -1,0 +1,761 @@
+[
+    {
+        "id": "a5dd0a7100318a20",
+        "type": "subflow",
+        "name": "Custom Final node",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "c5a5ccfbb1677270"
+                    },
+                    {
+                        "id": "d05ee4d1ad07b19b"
+                    }
+                ]
+            }
+        ],
+        "out": [],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "7bcfbb94df9c4b5d",
+        "type": "http request",
+        "z": "a5dd0a7100318a20",
+        "name": "",
+        "method": "POST",
+        "ret": "txt",
+        "paytoqs": "query",
+        "url": "http://172.23.82.111:9001/submit",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 450,
+        "y": 80,
+        "wires": [
+            [
+                "420b1bc54023315a"
+            ]
+        ]
+    },
+    {
+        "id": "420b1bc54023315a",
+        "type": "debug",
+        "z": "a5dd0a7100318a20",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c5a5ccfbb1677270",
+        "type": "debug",
+        "z": "a5dd0a7100318a20",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 210,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "d05ee4d1ad07b19b",
+        "type": "function",
+        "z": "a5dd0a7100318a20",
+        "name": "",
+        "func": "var hostArray = msg.hostarray;\nvar appArray = msg.apparray;\nfor (i = 0; i < hostArray.length; i++) {\n  msg.payload.topology_template.node_templates[hostArray[i][0]]=hostArray[i][1];\n} \nfor (i = 0; i < hostArray.length; i++) {\n  msg.payload.topology_template.node_templates[appArray[i][0]]=appArray[i][1];\n}\ndelete msg.hostarray;\ndelete msg.apparray;\ndelete msg.nodeorder;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 240,
+        "y": 80,
+        "wires": [
+            [
+                "7bcfbb94df9c4b5d",
+                "32c3c0327e8501a8"
+            ]
+        ]
+    },
+    {
+        "id": "32c3c0327e8501a8",
+        "type": "debug",
+        "z": "a5dd0a7100318a20",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "53cd29068da9be53",
+        "type": "subflow",
+        "name": " Custom Main node",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 280,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "abf55e399305afed"
+                    },
+                    {
+                        "id": "6c6c48fcc8f9f64d"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 700,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "abf55e399305afed",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "name",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Name"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Resources"
+                    },
+                    "type": "none"
+                }
+            },
+            {
+                "name": "cores",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Cores"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "ram",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Ram"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "hdd",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Disk space"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Settings"
+                    },
+                    "type": "none"
+                }
+            },
+            {
+                "name": "image",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Image"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "namespace",
+                "type": "str",
+                "value": "default",
+                "ui": {
+                    "label": {
+                        "en-US": "Namespace"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "type",
+                "type": "str",
+                "value": "producer",
+                "ui": {
+                    "label": {
+                        "en-US": "Type"
+                    },
+                    "type": "select",
+                    "opts": {
+                        "opts": [
+                            {
+                                "l": {
+                                    "en-US": "Producer"
+                                },
+                                "v": "producer"
+                            },
+                            {
+                                "l": {
+                                    "en-US": "Subscriber"
+                                },
+                                "v": "subscriber"
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "qlength",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Queue length"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "qscale",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Scale (Queue)"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "mrate",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Message rate"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "rscale",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "label": {
+                        "en-US": "Scale (Rate)"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "pv",
+                "type": "bool",
+                "value": "true",
+                "ui": {
+                    "label": {
+                        "en-US": "Persistent Volume"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str",
+                            "num",
+                            "bool",
+                            "json",
+                            "bin",
+                            "env",
+                            "conf-types"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "env_var",
+                "type": "json",
+                "value": ""
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "abf55e399305afed",
+        "type": "function",
+        "z": "53cd29068da9be53",
+        "name": "",
+        "func": "var nodeName = env.get(\"name\");\nvar hostName = nodeName+'-host';\nvar appName = nodeName+'-app';\nvar podName = nodeName+'-pod';\n\nvar cores = env.get(\"cores\");\nvar ram = env.get(\"ram\");\nvar hdd = env.get(\"hdd\");\n\nvar image = env.get(\"image\");\nvar namespace = env.get(\"namespace\");\nvar type = env.get(\"type\");\nvar qlength = env.get(\"qlength\");\nvar qscale = env.get(\"qscale\");\nvar mrate = env.get(\"mrate\");\nvar rscale = env.get(\"rscale\");\nvar persistentVol = env.get(\"pv\");\nvar envVar = env.get(\"env_var\");\n\nvar nodeOrder = ++msg.nodeorder;\nmsg.nodeorder = nodeOrder;\n\nvar inputQueue = namespace+'/'+nodeOrder;\nvar outputQueue = namespace+'/'+(++nodeOrder);\n\nvar hostArray = msg.hostarray;\nvar appArray = msg.apparray;\n\nvar hostTemplate = {\n        \"type\": \"tosca.nodes.Compute\",\n        \"capabilities\": {\n          \"host\": {\n            \"properties\": {\n              \"num_cpus\": cores,\n              \"mem_size\": ram,\n              \"disk_size\": hdd\n            }\n          },\n          \"os\": {\n            \"properties\": {\n              \"architecture\": \"x86_64\",\n              \"type\": \"linux\"\n            }\n          }\n        }\n      };\n      \nvar appTemplate = {\n        \"type\": \"Operator\",\n        \"properties\": {\n          \"image\": image,\n          \"name\": podName,\n          \"application\": namespace,\n          \"operator_type\": type,\n          \"order\": nodeOrder,\n          \"persistent_volume\": persistentVol,\n          \"queues\": {\n            \"properties\": {\n              \"input_queue\": inputQueue,\n              \"output_queue\": outputQueue,\n            }\n          },\n          \"scale\": [],\n          \"variables\": envVar,\n          \"port\": [\n            20766\n          ]\n        },\n        \"requirements\": [\n          {\n            \"host\": hostName\n          }\n        ]\n      };\n\nvar scaleCounter = 0;\nnode.warn(scaleCounter);\nif ((qlength > 0) && (qscale > 0)) {\n    appTemplate.properties.scale[scaleCounter] = {\n              \"rule\": scaleCounter+1,\n              \"condition\": \"QueueLength > \"+qlength,\n              \"input_queue\": inputQueue,\n              \"scale\": qscale\n            }\n    scaleCounter++;\n}\nnode.warn(scaleCounter);\nif ((mrate > 0) && (rscale > 0)) {\n    appTemplate.properties.scale[scaleCounter] = {\n              \"rule\": scaleCounter+1,\n              \"condition\": \"MessageRate > \"+mrate,\n              \"input_queue\": inputQueue,\n              \"scale\": rscale\n            }\n    scaleCounter++;\n}\n\nnode.warn(scaleCounter);\n//msg.payload.topology_template.node_templates[hostName]=hostTemplate;\n//msg.payload.topology_template.node_templates[appName]=appTemplate;\nhostArray.push([hostName,hostTemplate]);\nappArray.push([appName,appTemplate]);\nmsg.hostarray = hostArray;\nmsg.apparray = appArray;\nif (appTemplate.properties.scale.length > 0) {\n    node.warn(\"Sending template to next node!\");\n    return msg;   \n} else {\n    node.warn(\"Please check again, Queue length, Queue scale, Message rate, Rate scale! Halting execution!\")\n}",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 100,
+        "wires": [
+            [
+                "d2e8cd0bc9666b73"
+            ]
+        ]
+    },
+    {
+        "id": "d2e8cd0bc9666b73",
+        "type": "debug",
+        "z": "53cd29068da9be53",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "6c6c48fcc8f9f64d",
+        "type": "debug",
+        "z": "53cd29068da9be53",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "4528b732efcbf0e4",
+        "type": "subflow",
+        "name": "Custom Init node",
+        "info": "",
+        "category": "",
+        "in": [],
+        "out": [
+            {
+                "x": 560,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "a5ab14dcd4469f3e",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "Global settings",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "type": "none"
+                }
+            },
+            {
+                "name": "platform",
+                "type": "str",
+                "value": "localhost:1880/platform",
+                "ui": {
+                    "label": {
+                        "en-US": "Platform server"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            }
+        ],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "a5ab14dcd4469f3e",
+        "type": "function",
+        "z": "4528b732efcbf0e4",
+        "name": "",
+        "func": "var platformUrl = env.get(\"platform\");\nvar templateHeader;\nvar nodeOrder = 0;\nvar hostArray = [];\nvar appArray = [];\n\ntemplateHeader = {\n  \"tosca_definitions_version\": \"tosca_simple_yaml_1_2\",\n  \"description\": \"Application model of ORBK Use Case\",\n  \"imports\": [\n    \"definitions/custom_types.yaml\"\n  ],\n  \"topology_template\": {\n    \"node_templates\": {\n    }\n  }\n};\nmsg.payload = templateHeader;\nmsg.url = platformUrl;\nmsg.nodeorder = nodeOrder;\nmsg.hostarray = hostArray;\nmsg.apparray = appArray;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 380,
+        "y": 100,
+        "wires": [
+            [
+                "062d2b8f6c219bba"
+            ]
+        ]
+    },
+    {
+        "id": "506c58b0e152d9ef",
+        "type": "inject",
+        "z": "4528b732efcbf0e4",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 100,
+        "wires": [
+            [
+                "a5ab14dcd4469f3e"
+            ]
+        ]
+    },
+    {
+        "id": "062d2b8f6c219bba",
+        "type": "debug",
+        "z": "4528b732efcbf0e4",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "url",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "e123682e458c4b8b",
+        "type": "tab",
+        "label": "Template Flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6a17dd91c5ee2090",
+        "type": "subflow:4528b732efcbf0e4",
+        "z": "e123682e458c4b8b",
+        "name": "",
+        "x": 120,
+        "y": 120,
+        "wires": [
+            [
+                "ecf0fda9a397b7b1"
+            ]
+        ]
+    },
+    {
+        "id": "ecf0fda9a397b7b1",
+        "type": "subflow:53cd29068da9be53",
+        "z": "e123682e458c4b8b",
+        "name": "Producer",
+        "env": [
+            {
+                "name": "name",
+                "value": "producer",
+                "type": "str"
+            },
+            {
+                "name": "cores",
+                "value": "1",
+                "type": "num"
+            },
+            {
+                "name": "ram",
+                "value": "512MB",
+                "type": "str"
+            },
+            {
+                "name": "hdd",
+                "value": "10GB",
+                "type": "str"
+            },
+            {
+                "name": "image",
+                "value": "gkorod/generator:v0.9",
+                "type": "str"
+            },
+            {
+                "name": "namespace",
+                "value": "reproduce-csl",
+                "type": "str"
+            },
+            {
+                "name": "qlength",
+                "value": "5000",
+                "type": "num"
+            },
+            {
+                "name": "qscale",
+                "value": "3",
+                "type": "num"
+            },
+            {
+                "name": "mrate",
+                "value": "30",
+                "type": "num"
+            },
+            {
+                "name": "rscale",
+                "value": "3",
+                "type": "num"
+            },
+            {
+                "name": "env_var",
+                "value": "{}",
+                "type": "json"
+            },
+            {
+                "name": "set_var",
+                "value": "false",
+                "type": "bool"
+            },
+            {
+                "name": "env_variables",
+                "value": "false",
+                "type": "bool"
+            },
+            {
+                "name": "list_variables",
+                "value": "{}",
+                "type": "json"
+            }
+        ],
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "783010fb8e57e182"
+            ]
+        ]
+    },
+    {
+        "id": "783010fb8e57e182",
+        "type": "subflow:53cd29068da9be53",
+        "z": "e123682e458c4b8b",
+        "name": "Subscriber",
+        "env": [
+            {
+                "name": "name",
+                "value": "subscriber",
+                "type": "str"
+            },
+            {
+                "name": "cores",
+                "value": "1",
+                "type": "num"
+            },
+            {
+                "name": "ram",
+                "value": "4GB",
+                "type": "str"
+            },
+            {
+                "name": "hdd",
+                "value": "2GB",
+                "type": "str"
+            },
+            {
+                "name": "image",
+                "value": "gkorod/grouper:v2.1",
+                "type": "str"
+            },
+            {
+                "name": "namespace",
+                "value": "reproduce-csl",
+                "type": "str"
+            },
+            {
+                "name": "type",
+                "value": "subscriber",
+                "type": "str"
+            },
+            {
+                "name": "qlength",
+                "value": "5000",
+                "type": "num"
+            },
+            {
+                "name": "qscale",
+                "value": "3",
+                "type": "num"
+            },
+            {
+                "name": "mrate",
+                "value": "30",
+                "type": "num"
+            },
+            {
+                "name": "rscale",
+                "value": "3",
+                "type": "num"
+            },
+            {
+                "name": "pv",
+                "value": "false",
+                "type": "bool"
+            },
+            {
+                "name": "env_var",
+                "value": "{\"DATABASE_HOST\":\"192.108.2.1\",\"DATABASE_PORT\":\"9999\"}",
+                "type": "json"
+            },
+            {
+                "name": "env_variables",
+                "value": "false",
+                "type": "bool"
+            },
+            {
+                "name": "list_variables",
+                "value": "{\"DATABASE_HOST\":\"192.108.2.1\",\"DATABASE_PORT\":\"9999\"}",
+                "type": "json"
+            }
+        ],
+        "x": 510,
+        "y": 120,
+        "wires": [
+            [
+                "8f96ac61dfd82763"
+            ]
+        ]
+    },
+    {
+        "id": "8f96ac61dfd82763",
+        "type": "subflow:a5dd0a7100318a20",
+        "z": "e123682e458c4b8b",
+        "name": "",
+        "x": 730,
+        "y": 120,
+        "wires": []
+    }
+]
