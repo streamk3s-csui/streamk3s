@@ -27,22 +27,51 @@ def write_rules_config(operatorlist):
                     queue = rule.get('output_queue')
                 if rule.get('input_queue'):
                     queue = rule.get('input_queue')
+                scale_object = {
+                    'apiVersion': 'keda.sh/v1alpha1',
+                    'kind': 'ScaledObject',
+                    'metadata': {
+                        'name': name, 
+                        'namespace': namespace
+                    },
+                    'spec': {
+                        'scaleTargetRef': {'name': name}, 
+                        'pollingInterval': 5, 
+                        'cooldownPeriod': 10,
+                        'minReplicaCount': 1, 
+                        'maxReplicaCount': scale_up,
+                        'triggers': []
+                    }
+                }
                 if 'QueueLength' in condition:
                     condition_name = 'QueueLength'
+                    value = int(re.search(r'\d+', condition).group())
+                    scale_object['spec']['triggers'].append(
+                        {
+                            'type': 'rabbitmq',
+                            'metadata': {
+                                'protocol': 'http', 
+                                'queueName': queue,
+                                'mode': condition_name,
+                                'value': str(value)},
+                                'authenticationRef': {'name': 'keda-trigger-auth-rabbitmq-conn'}
+                        }
+                    )
                 if 'MessageRate' in condition:
                     condition_name = 'MessageRate'
+                    value = int(re.search(r'\d+', condition).group())
+                    scale_object['spec']['triggers'].append(
+                        {
+                            'type': 'rabbitmq',
+                            'metadata': {
+                                'protocol': 'http', 
+                                'queueName': queue,
+                                'mode': condition_name,
+                                'value': str(value)},
+                                'authenticationRef': {'name': 'keda-trigger-auth-rabbitmq-conn'}
+                        }
+                    )
                 value = int(re.search(r'\d+', condition).group())
-                scale_object = {'apiVersion': 'keda.sh/v1alpha1',
-                                'kind': 'ScaledObject',
-                                'metadata': {'name': name, 'namespace': namespace},
-                                'spec': {'scaleTargetRef': {'name': name}, 'pollingInterval': 5, 'cooldownPeriod': 10,
-                                         'minReplicaCount': 1, 'maxReplicaCount': scale_up,
-                                         'triggers': [
-                                             {'type': 'rabbitmq',
-                                              'metadata': {'protocol': 'http', 'queueName': queue,
-                                                           'mode': condition_name,
-                                                           'value': str(value)},
-                                              'authenticationRef': {'name': 'keda-trigger-auth-rabbitmq-conn'}}]}}
                 logging.info(scale_object)
                 Kubernetes.apply(scale_object)
             password = os.getenv("RABBITMQ_PASSWORD", "password")
