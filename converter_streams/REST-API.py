@@ -52,28 +52,28 @@ def validate():
             persistent_volumes, deployment_files, confimap_files = Converter.tosca_to_k8s(
                 operator_list, host_list,
                 namespace)
-            Kubernetes.apply(namespace_file)
+            Kubernetes.apply(namespace_file, logger=logger)
             # write the namespace file to yaml
             ff = open(dirpath + '/namespace.yaml', 'w+')
             yaml.dump(namespace_file, ff, allow_unicode=True, sort_keys=False)
             ff.close()
             if persistent_volumes:
                 for pv in persistent_volumes:
-                    Kubernetes.apply(pv)
+                    Kubernetes.apply(pv, logger=logger)
                     # write the persistent volume file to yaml
                     file_id = str(uuid.uuid4())
                     ff = open(dirpath + '/persistent_volume'+ file_id+'.yaml', 'w+')
                     yaml.dump(pv, ff, allow_unicode=True, sort_keys=False)
                     ff.close()
             for configmap in confimap_files:
-                Kubernetes.apply(configmap)
+                Kubernetes.apply(configmap, logger=logger)
                 # write the configmap file to yaml
                 file_id = str(uuid.uuid4())
                 ff = open(dirpath + '/configmap'+ file_id +'.yaml', 'w+')
                 yaml.dump(configmap, ff, allow_unicode=True, sort_keys=False)
                 ff.close()
             for deploy in deployment_files:
-                Kubernetes.apply(deploy)
+                Kubernetes.apply(deploy, logger=logger)
                 # write the deployment file to yaml
                 file_id = str(uuid.uuid4())
                 ff = open(dirpath + '/deployment'+ file_id +'.yaml', 'w+')
