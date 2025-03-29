@@ -10,11 +10,12 @@ import socket
 
 def apply(data):
     dirpath = tempfile.mkdtemp(dir=os.getcwd())
-    ff = open(dirpath + '/temp.yaml', 'w+')
+    filename = dirpath + '/temp.yaml'
+    ff = open(filename, 'w+')
     yaml.dump(data, ff, allow_unicode=True, sort_keys=False)
     ff.close()
-    os.system("kubectl apply -f " + dirpath)
-    os.system("rm -r " + dirpath)
+    os.system("kubectl apply -f " + filename)
+    os.system("rm -r " + filename)
 
 
 

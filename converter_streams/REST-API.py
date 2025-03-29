@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 import tempfile
+import uuid
 import KEDA
 import yaml
 from flask import Flask, request
@@ -52,13 +53,32 @@ def validate():
                 operator_list, host_list,
                 namespace)
             Kubernetes.apply(namespace_file)
+            # write the namespace file to yaml
+            ff = open(dirpath + '/namespace.yaml', 'w+')
+            yaml.dump(namespace_file, ff, allow_unicode=True, sort_keys=False)
+            ff.close()
             if persistent_volumes:
                 for pv in persistent_volumes:
                     Kubernetes.apply(pv)
+                    # write the persistent volume file to yaml
+                    file_id = str(uuid.uuid4())
+                    ff = open(dirpath + '/persistent_volume'+ file_id+'.yaml', 'w+')
+                    yaml.dump(pv, ff, allow_unicode=True, sort_keys=False)
+                    ff.close()
             for configmap in confimap_files:
                 Kubernetes.apply(configmap)
+                # write the configmap file to yaml
+                file_id = str(uuid.uuid4())
+                ff = open(dirpath + '/configmap'+ file_id +'.yaml', 'w+')
+                yaml.dump(configmap, ff, allow_unicode=True, sort_keys=False)
+                ff.close()
             for deploy in deployment_files:
                 Kubernetes.apply(deploy)
+                # write the deployment file to yaml
+                file_id = str(uuid.uuid4())
+                ff = open(dirpath + '/deployment'+ file_id +'.yaml', 'w+')
+                yaml.dump(deploy, ff, allow_unicode=True, sort_keys=False)
+                ff.close()
                 os.system("kubectl wait --for condition=ready pods --all -n " + namespace + " --timeout=30s")
             KEDA.write_rules_config(operator_list)
             Converter.configure_instancemanager({"queue": "termination-queue", "namespace": namespace})
