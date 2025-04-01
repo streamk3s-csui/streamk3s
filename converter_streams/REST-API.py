@@ -28,6 +28,8 @@ def validate():
 
     application_model_path = os.path.join(static_dir, "application_model.yaml")
 
+    logging.info("application model path: %s", application_model_path)
+
     with open(application_model_path, "w+") as ff:
         yaml.dump(content, ff, allow_unicode=True, sort_keys=False)
 

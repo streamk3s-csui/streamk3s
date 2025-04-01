@@ -99,7 +99,7 @@ def write_rules_config(operatorlist, dirpath):
             "metadata": {"name": "keda-rabbitmq-secret", "namespace": namespace},
             "data": {"host": credentials},
         }
-        Kubernetes.apply(secret_config)
+        Kubernetes.apply(secret_config, dirpath)
 
         trigger_auth = {
             "apiVersion": "keda.sh/v1alpha1",
@@ -114,4 +114,4 @@ def write_rules_config(operatorlist, dirpath):
                 ]
             },
         }
-        Kubernetes.apply(trigger_auth)
+        Kubernetes.apply(trigger_auth, dirpath)
