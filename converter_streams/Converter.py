@@ -11,44 +11,58 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-log = logging.getLogger('Converter')
+log = logging.getLogger("Converter")
 log.addHandler(JournalHandler())
 log.setLevel(logging.INFO)
 
 
 def create_volumes(pod_name, disk_size, namespace):
-    pv = {'apiVersion': 'v1',
-          'kind': 'PersistentVolume',
-          'metadata': {'name': pod_name + '-pv', 'namespace': namespace},
-          'spec': {'capacity': {'storage': disk_size}, 'accessModes': ['ReadWriteOnce'],
-                   'persistentVolumeReclaimPolicy': 'Retain', 'storageClassName': 'local-path',
-                   'hostPath': {'path': '/mnt/data'}}
-          }
-    pvc = {
-        'apiVersion': 'v1',
-        'kind': 'PersistentVolumeClaim',
-        'metadata': {
-            'name': pod_name + '-pvc',
-            'namespace': namespace,
+    pv = {
+        "apiVersion": "v1",
+        "kind": "PersistentVolume",
+        "metadata": {"name": pod_name + "-pv", "namespace": namespace},
+        "spec": {
+            "capacity": {"storage": disk_size},
+            "accessModes": ["ReadWriteOnce"],
+            "persistentVolumeReclaimPolicy": "Retain",
+            "storageClassName": "local-path",
+            "hostPath": {"path": "/mnt/data"},
         },
-        'spec': {
-            'accessModes': [
-                'ReadWriteOnce'
-            ],
-            'resources': {
-                'requests': {
-                    'storage': disk_size,
+    }
+    pvc = {
+        "apiVersion": "v1",
+        "kind": "PersistentVolumeClaim",
+        "metadata": {
+            "name": pod_name + "-pvc",
+            "namespace": namespace,
+        },
+        "spec": {
+            "accessModes": ["ReadWriteOnce"],
+            "resources": {
+                "requests": {
+                    "storage": disk_size,
                 },
             },
-            'storageClassName': 'local-path',
+            "storageClassName": "local-path",
         },
     }
 
     return pv, pvc
 
 
-def create_deployments(pod_name, namespace, application_label, order, image_name, resource_yaml, disk, os, node_arch,
-                       persistent_volume, port_yaml):
+def create_deployments(
+    pod_name,
+    namespace,
+    application_label,
+    order,
+    image_name,
+    resource_yaml,
+    disk,
+    os,
+    node_arch,
+    persistent_volume,
+    port_yaml,
+):
     if not persistent_volume:
         deployment = {
             "apiVersion": "apps/v1",
@@ -56,92 +70,90 @@ def create_deployments(pod_name, namespace, application_label, order, image_name
             "metadata": {
                 "name": pod_name,
                 "namespace": namespace,
-                "labels": {"app": application_label}
+                "labels": {"app": application_label},
             },
-            'spec': {
-                'selector': {
-                    'matchLabels': {
-                        'app': application_label}},
-                'strategy': {
-                    'type': 'Recreate'},
-                'template': {
-                    'metadata': {
-                        'labels': {
-                            'app': application_label}},
+            "spec": {
+                "selector": {"matchLabels": {"app": application_label}},
+                "strategy": {"type": "Recreate"},
+                "template": {
+                    "metadata": {"labels": {"app": application_label}},
                     "spec": {
                         "containers": [
                             {
                                 "name": "companion-container",
-                                "image": "gkorod/companion:v2.4",
+                                "image": "kevinmarcellius/companion:latest",
                                 "imagePullPolicy": "IfNotPresent",
                                 "env": [
                                     {
                                         "name": "MY_POD_IP",
                                         "valueFrom": {
-                                            "fieldRef": {
-                                                "fieldPath": "status.podIP"
-                                            }
-                                        }
+                                            "fieldRef": {"fieldPath": "status.podIP"}
+                                        },
                                     },
-                                    {"name": "MY_POD_NAME",
-                                     "valueFrom": {"fieldRef": {"fieldPath": "metadata.name"}}},
+                                    {
+                                        "name": "MY_POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {"fieldPath": "metadata.name"}
+                                        },
+                                    },
                                 ],
                                 "ports": [
+                                    {"containerPort": 4321, "name": "publishport"}
+                                ],
+                                "volumeMounts": [
                                     {
-                                        "containerPort": 4321,
-                                        "name": "publishport"
+                                        "name": "cache-volume",
+                                        "mountPath": "volume" + order,
                                     }
                                 ],
-                                'volumeMounts': [
-                                    {
-                                        'name': 'cache-volume',
-                                        'mountPath': 'volume' + order}],
                                 "envFrom": [
-                                    {
-                                        "configMapRef": {
-                                            "name": "publishconfig-" + order
-                                        }
-                                    }
-                                ]
+                                    {"configMapRef": {"name": "publishconfig-" + order}}
+                                ],
                             },
                             {
                                 "name": pod_name,
-                                'resources': resource_yaml,
+                                "resources": resource_yaml,
                                 "image": image_name,
                                 "imagePullPolicy": "IfNotPresent",
                                 "env": [
                                     {
                                         "name": "MY_POD_IP",
                                         "valueFrom": {
-                                            "fieldRef": {
-                                                "fieldPath": "status.podIP"
-                                            }
-                                        }
+                                            "fieldRef": {"fieldPath": "status.podIP"}
+                                        },
                                     },
-                                    {"name": "MY_POD_NAME",
-                                     "valueFrom": {"fieldRef": {"fieldPath": "metadata.name"}}},
-                                    {"name": "MY_POD_NAMESPACE",
-                                     "valueFrom": {"fieldRef": {"fieldPath": "metadata.namespace"}}}
+                                    {
+                                        "name": "MY_POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {"fieldPath": "metadata.name"}
+                                        },
+                                    },
+                                    {
+                                        "name": "MY_POD_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        },
+                                    },
                                 ],
                                 "ports": port_yaml,
                                 "envFrom": [
-                                    {
-                                        "configMapRef": {
-                                            "name": "appconfig-" + order
-                                        }
-                                    }
-                                ]
-                            }
-
+                                    {"configMapRef": {"name": "appconfig-" + order}}
+                                ],
+                            },
                         ],
-                        'volumes': [{
-                            'name': 'cache-volume',
-                            'emptyDir': {'sizeLimit': disk}}],
-                        'nodeSelector': {
-                            'beta.kubernetes.io/os': os,
-                            'beta.kubernetes.io/arch': node_arch},
-                    }
-                }}}
+                        "volumes": [
+                            {"name": "cache-volume", "emptyDir": {"sizeLimit": disk}}
+                        ],
+                        "nodeSelector": {
+                            "beta.kubernetes.io/os": os,
+                            "beta.kubernetes.io/arch": node_arch,
+                        },
+                    },
+                },
+            },
+        }
     else:
         deployment = {
             "apiVersion": "apps/v1",
@@ -149,105 +161,112 @@ def create_deployments(pod_name, namespace, application_label, order, image_name
             "metadata": {
                 "name": pod_name,
                 "namespace": namespace,
-                "labels": {"app": application_label}
+                "labels": {"app": application_label},
             },
-            'spec': {
-                'selector': {
-                    'matchLabels': {
-                        'app': application_label}},
-                'strategy': {
-                    'type': 'Recreate'},
-                'template': {
-                    'metadata': {
-                        'labels': {
-                            'app': application_label}},
+            "spec": {
+                "selector": {"matchLabels": {"app": application_label}},
+                "strategy": {"type": "Recreate"},
+                "template": {
+                    "metadata": {"labels": {"app": application_label}},
                     "spec": {
                         "containers": [
                             {
                                 "name": "companion-container",
-                                "image": "gkorod/companion:v2.4",
+                                "image": "kevinmarcellius/companion:latest",
                                 "imagePullPolicy": "IfNotPresent",
                                 "env": [
                                     {
                                         "name": "MY_POD_IP",
                                         "valueFrom": {
-                                            "fieldRef": {
-                                                "fieldPath": "status.podIP"
-                                            }
-                                        }
+                                            "fieldRef": {"fieldPath": "status.podIP"}
+                                        },
                                     },
-                                    {"name": "MY_POD_NAME",
-                                     "valueFrom": {"fieldRef": {"fieldPath": "metadata.name"}}},
+                                    {
+                                        "name": "MY_POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {"fieldPath": "metadata.name"}
+                                        },
+                                    },
                                 ],
                                 "ports": [
+                                    {"containerPort": 4321, "name": "publishport"}
+                                ],
+                                "volumeMounts": [
                                     {
-                                        "containerPort": 4321,
-                                        "name": "publishport"
+                                        "name": "cache-volume",
+                                        "mountPath": "volume" + order,
                                     }
                                 ],
-                                'volumeMounts': [
-                                    {
-                                        'name': 'cache-volume',
-                                        'mountPath': 'volume' + order}],
                                 "envFrom": [
-                                    {
-                                        "configMapRef": {
-                                            "name": "publishconfig-" + order
-                                        }
-                                    }
-                                ]
+                                    {"configMapRef": {"name": "publishconfig-" + order}}
+                                ],
                             },
                             {
                                 "name": pod_name,
-                                'resources': resource_yaml,
+                                "resources": resource_yaml,
                                 "image": image_name,
-                                "volumeMounts": [{"mountPath": "/opt/model/", "name": pod_name + "-volume"}],
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/opt/model/",
+                                        "name": pod_name + "-volume",
+                                    }
+                                ],
                                 "imagePullPolicy": "IfNotPresent",
                                 "env": [
                                     {
                                         "name": "MY_POD_IP",
                                         "valueFrom": {
-                                            "fieldRef": {
-                                                "fieldPath": "status.podIP"
-                                            }
-                                        }
+                                            "fieldRef": {"fieldPath": "status.podIP"}
+                                        },
                                     },
-                                    {"name": "MY_POD_NAME",
-                                     "valueFrom": {"fieldRef": {"fieldPath": "metadata.name"}}},
-                                    {"name": "MY_POD_NAMESPACE",
-                                     "valueFrom": {"fieldRef": {"fieldPath": "metadata.namespace"}}}
+                                    {
+                                        "name": "MY_POD_NAME",
+                                        "valueFrom": {
+                                            "fieldRef": {"fieldPath": "metadata.name"}
+                                        },
+                                    },
+                                    {
+                                        "name": "MY_POD_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        },
+                                    },
                                 ],
                                 "ports": port_yaml,
                                 "envFrom": [
-                                    {
-                                        "configMapRef": {
-                                            "name": "appconfig-" + order
-                                        }
-                                    }
-                                ]
-                            }
-
+                                    {"configMapRef": {"name": "appconfig-" + order}}
+                                ],
+                            },
                         ],
-                        'volumes': [{
-                            'name': 'cache-volume',
-                            'emptyDir': {'sizeLimit': disk}},
-                            {'name': pod_name + '-volume',
-                             'persistentVolumeClaim': {'claimName': pod_name + '-pvc'}}],
-                        'nodeSelector': {
-                            'beta.kubernetes.io/os': os,
-                            'beta.kubernetes.io/arch': node_arch},
-                    }
-                }}}
+                        "volumes": [
+                            {"name": "cache-volume", "emptyDir": {"sizeLimit": disk}},
+                            {
+                                "name": pod_name + "-volume",
+                                "persistentVolumeClaim": {
+                                    "claimName": pod_name + "-pvc"
+                                },
+                            },
+                        ],
+                        "nodeSelector": {
+                            "beta.kubernetes.io/os": os,
+                            "beta.kubernetes.io/arch": node_arch,
+                        },
+                    },
+                },
+            },
+        }
     return deployment
 
 
 def convert_bytes(bytes):
     output = 0
-    if 'MB' in bytes:
-        number = bytes.replace('MB', '')
+    if "MB" in bytes:
+        number = bytes.replace("MB", "")
         output = int(number) * 1024 * 1024
-    if 'GB' in bytes:
-        number = bytes.replace('GB', '')
+    if "GB" in bytes:
+        number = bytes.replace("GB", "")
         output = int(number) * 1024 * 1024 * 1024
     return output
 
@@ -268,17 +287,18 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                 disk_size = convert_bytes(x.get_disk())
                 kube_disk = size(disk_size, system=iec)
                 pod_name = y.get_name()
-                if x.get_arch() == 'x86_64':
-                    node_arch = 'amd64'
+                if x.get_arch() == "x86_64":
+                    node_arch = "amd64"
                 if not persistent_volume:
                     resource_yaml = {
-                        'limits': {'cpu': x.get_cpu(),
-                                   'memory': kube_ram,
-                                   'ephemeral-storage': kube_disk}}
+                        "limits": {
+                            "cpu": x.get_cpu(),
+                            "memory": kube_ram,
+                            "ephemeral-storage": kube_disk,
+                        }
+                    }
                 if persistent_volume:
-                    resource_yaml = {
-                        'limits': {'cpu': x.get_cpu(),
-                                   'memory': kube_ram}}
+                    resource_yaml = {"limits": {"cpu": x.get_cpu(), "memory": kube_ram}}
                     pv, pvc = create_volumes(pod_name, kube_disk, namespace_pack)
                     persistent_volumes.append(pv)
                     persistent_volumes.append(pvc)
@@ -291,21 +311,41 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                 order = y.get_order()
                 variables = y.get_variables()
 
-                configmap_list = generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password, variables,
-                                                     configmap_list)
+                configmap_list = generate_configmaps(
+                    input_queue,
+                    output_queue,
+                    order,
+                    namespace_pack,
+                    ip,
+                    password,
+                    configmap_list,
+                )
                 ports = y.get_port()
                 i = 0
                 for port in ports:
                     i = i + 1
-                    content = {'containerPort': int(port), 'name': y.get_name() + str(i)}
+                    content = {
+                        "containerPort": int(port),
+                        "name": y.get_name() + str(i),
+                    }
                     port_yaml.append(content)
                 application_label = y.get_application()
                 image_name = y.get_image()
                 operating_system = x.get_os()
                 order = str(y.get_order())
-                deployment = create_deployments(pod_name, namespace_pack, application_label, order, image_name,
-                                                resource_yaml, kube_disk, operating_system, node_arch,
-                                                persistent_volume, port_yaml)
+                deployment = create_deployments(
+                    pod_name,
+                    namespace_pack,
+                    application_label,
+                    order,
+                    image_name,
+                    resource_yaml,
+                    kube_disk,
+                    operating_system,
+                    node_arch,
+                    persistent_volume,
+                    port_yaml,
+                )
 
                 deployment_files.append(deployment)
     generate_queue("termination-queue", namespace_pack)
@@ -313,23 +353,35 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
 
 
 def secret_generation(json, application):
-    secret = {'apiVersion': 'v1',
-              'kind': 'Secret',
-              'metadata': {
-                  'name': application + '-registry-credentials',
-                  'namespace': application},
-              'type': 'kubernetes.io/dockerconfigjson',
-              'data': {
-                  '.dockerconfigjson': json}}
+    secret = {
+        "apiVersion": "v1",
+        "kind": "Secret",
+        "metadata": {
+            "name": application + "-registry-credentials",
+            "namespace": application,
+        },
+        "type": "kubernetes.io/dockerconfigjson",
+        "data": {".dockerconfigjson": json},
+    }
     return secret
 
 
 def namespace(application):
-    namespace = {'apiVersion': 'v1', 'kind': 'Namespace',
-                 'metadata': {'name': application}}
+    namespace = {
+        "apiVersion": "v1",
+        "kind": "Namespace",
+        "metadata": {"name": application},
+    }
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     ip = os.getenv("POD_IP", "ip")
-    command = 'curl -u user:' + password + ' -X PUT ' + ip + ':15672/api/vhosts/' + application
+    command = (
+        "curl -u user:"
+        + password
+        + " -X PUT "
+        + ip
+        + ":15672/api/vhosts/"
+        + application
+    )
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
@@ -340,8 +392,20 @@ def generate_queue(queue, application):
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     parameters = {"durable": True}
     ip = os.getenv("POD_IP", "ip")
-    command = "curl -u user:" + password + " -X PUT " + ip + ":15672/api/queues/" + application + "/" + queue + " --data " + "'" + json.dumps(
-        parameters) + "'"
+    command = (
+        "curl -u user:"
+        + password
+        + " -X PUT "
+        + ip
+        + ":15672/api/queues/"
+        + application
+        + "/"
+        + queue
+        + " --data "
+        + "'"
+        + json.dumps(parameters)
+        + "'"
+    )
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
@@ -354,27 +418,29 @@ def configure_instancemanager(message_dict):
         print("Instancemanager is not configured, status code:", response.status_code)
 
 
-def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, password, variables, configmap_list):
+def generate_configmaps(
+    input_queue, output_queue, order, namespace_pack, ip, password, configmap_list
+):
     if input_queue is not None and output_queue is not None:
         operator_configmap = {
             "kind": "ConfigMap",
             "apiVersion": "v1",
             "metadata": {
                 "name": "appconfig-" + str(order),
-                "namespace": namespace_pack
+                "namespace": namespace_pack,
             },
             "data": {
                 "API_PORT": "4321",
                 "PUBLISH_PATH": "/post_message",
                 "CONSUME_PATH": "/get_message",
-            }
+            },
         }
         publish_configmap = {
             "kind": "ConfigMap",
             "apiVersion": "v1",
             "metadata": {
                 "name": "publishconfig-" + str(order),
-                "namespace": namespace_pack
+                "namespace": namespace_pack,
             },
             "data": {
                 "OPERATOR_PORT": "4322",
@@ -384,8 +450,8 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
                 "INPUT_QUEUE": input_queue,
                 "OUTPUT_QUEUE": output_queue,
                 "TERMINATION_QUEUE": "termination-queue",
-                "APPLICATION": namespace_pack
-            }
+                "APPLICATION": namespace_pack,
+            },
         }
         generate_queue(input_queue, namespace_pack)
         generate_queue(output_queue, namespace_pack)
@@ -395,20 +461,19 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
             "apiVersion": "v1",
             "metadata": {
                 "name": "appconfig-" + str(order),
-                "namespace": namespace_pack
+                "namespace": namespace_pack,
             },
             "data": {
                 "API_PORT": "4321",
                 "CONSUME_PATH": "/get_message",
-
-            }
+            },
         }
         publish_configmap = {
             "kind": "ConfigMap",
             "apiVersion": "v1",
             "metadata": {
                 "name": "publishconfig-" + str(order),
-                "namespace": namespace_pack
+                "namespace": namespace_pack,
             },
             "data": {
                 "OPERATOR_PORT": "4322",
@@ -417,8 +482,8 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
                 "RABBITMQ_PASSWORD": password,
                 "INPUT_QUEUE": input_queue,
                 "TERMINATION_QUEUE": "termination-queue",
-                "APPLICATION": namespace_pack
-            }
+                "APPLICATION": namespace_pack,
+            },
         }
 
     if output_queue is not None and input_queue is None:
@@ -427,12 +492,12 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
             "apiVersion": "v1",
             "metadata": {
                 "name": "appconfig-" + str(order),
-                "namespace": namespace_pack
+                "namespace": namespace_pack,
             },
             "data": {
                 "API_PORT": "4321",
                 "PUBLISH_PATH": "/post_message",
-            }
+            },
         }
 
         publish_configmap = {
@@ -440,7 +505,7 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
             "apiVersion": "v1",
             "metadata": {
                 "name": "publishconfig-" + str(order),
-                "namespace": namespace_pack
+                "namespace": namespace_pack,
             },
             "data": {
                 "OPERATOR_PORT": "4322",
@@ -449,12 +514,12 @@ def generate_configmaps(input_queue, output_queue, order, namespace_pack, ip, pa
                 "RABBITMQ_PASSWORD": password,
                 "TERMINATION_QUEUE": "termination-queue",
                 "OUTPUT_QUEUE": output_queue,
-                "APPLICATION": namespace_pack
-            }
+                "APPLICATION": namespace_pack,
+            },
         }
 
         generate_queue(output_queue, namespace_pack)
-    # add custom env variables    
+    # add custom env variables
     if variables:
         for key, value in variables.items():
             operator_configmap["data"][key] = value
