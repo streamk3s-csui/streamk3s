@@ -1,7 +1,5 @@
-import tempfile
 import re
 import Kubernetes
-import oyaml as yaml
 import os
 import logging
 import base64
