@@ -81,7 +81,7 @@ def create_deployments(
                         "containers": [
                             {
                                 "name": "companion-container",
-                                "image": "kevinmarcellius/companion:latest",
+                                "image": "kevinmarcellius/companion:v1.0",
                                 "imagePullPolicy": "IfNotPresent",
                                 "env": [
                                     {
@@ -172,7 +172,7 @@ def create_deployments(
                         "containers": [
                             {
                                 "name": "companion-container",
-                                "image": "kevinmarcellius/companion:latest",
+                                "image": "kevinmarcellius/companion:v1.0",
                                 "imagePullPolicy": "IfNotPresent",
                                 "env": [
                                     {
