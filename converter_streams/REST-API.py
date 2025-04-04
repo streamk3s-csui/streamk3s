@@ -16,6 +16,14 @@ import datetime
 app = Flask(__name__)
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+# Configure logging to use JournalHandler
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+journal_handler = JournalHandler()
+journal_handler.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+journal_handler.setFormatter(formatter)
+logger.addHandler(journal_handler)
 
 
 @app.route("/submit", methods=["POST"])

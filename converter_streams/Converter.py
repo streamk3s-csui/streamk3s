@@ -318,6 +318,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                     namespace_pack,
                     ip,
                     password,
+                    variables,
                     configmap_list,
                 )
                 ports = y.get_port()
@@ -419,7 +420,14 @@ def configure_instancemanager(message_dict):
 
 
 def generate_configmaps(
-    input_queue, output_queue, order, namespace_pack, ip, password, configmap_list
+    input_queue,
+    output_queue,
+    order,
+    namespace_pack,
+    ip,
+    password,
+    variables,
+    configmap_list,
 ):
     if input_queue is not None and output_queue is not None:
         operator_configmap = {
