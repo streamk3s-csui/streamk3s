@@ -99,4 +99,4 @@ def configure_rabbitmq_connection(namespace, dirpath):
             ]
         },
     }
-    Kubernetes.apply(trigger_auth)
+    Kubernetes.apply(trigger_auth, dirpath)
