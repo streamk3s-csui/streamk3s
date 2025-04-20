@@ -74,6 +74,28 @@ def validate():
                     + " --timeout=30s"
                 )
             KEDA.write_rules_config(operator_list, static_dir)
+
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            producer_service_file_path = os.path.join(
+                script_dir, "producer-service.yaml"
+            )
+
+            try:
+                with open(producer_service_file_path, "r") as f:
+                    producer_service_data = yaml.safe_load(f)
+                if not producer_service_data:
+                    logger.error("producer-service.yaml is empty or invalid.")
+                else:
+                    Kubernetes.apply(producer_service_data, static_dir)
+            except FileNotFoundError:
+                logger.error(
+                    f"Error: producer-service.yaml not found at {producer_service_file_path}"
+                )
+            except yaml.YAMLError as e:
+                logger.error(f"Error parsing producer-service.yaml: {e}")
+            except Exception as e:
+                logger.error(f"An error occurred applying producer-service.yaml: {e}")
+
             Converter.configure_instancemanager(
                 {"queue": "termination-queue", "namespace": namespace}
             )
