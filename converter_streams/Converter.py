@@ -375,14 +375,17 @@ def namespace(application):
     }
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     ip = os.getenv("POD_IP", "ip")
+    # SOLVED: rabbitmq loadbalancer service expose the 30298 port, forward to 15672
+    # SOLVED : can use localhost as ip
     command = (
         "curl -u user:"
         + password
         + " -X PUT "
-        + ip
-        + ":15672/api/vhosts/"
+        + "localhost"
+        + ":30298/api/vhosts/"
         + application
     )
+    # curl -u user:xw -X PUT http://localhost:30298/api/vhosts/axl2
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
@@ -393,12 +396,14 @@ def generate_queue(queue, application):
     password = os.getenv("RABBITMQ_PASSWORD", "password")
     parameters = {"durable": True}
     ip = os.getenv("POD_IP", "ip")
+    # SOLVED: rabbitmq loadbalancer service expose the 30298 port, forward to 15672
+    # SOLVED : can use localhost as ip
     command = (
         "curl -u user:"
         + password
         + " -X PUT "
         + ip
-        + ":15672/api/queues/"
+        + ":30298/api/queues/"
         + application
         + "/"
         + queue
@@ -407,6 +412,7 @@ def generate_queue(queue, application):
         + json.dumps(parameters)
         + "'"
     )
+    # curl -u user:xw -X PUT http://localhost:30298/api/queues/axl2/simpleq --data '{"durable":true}'
     print(str(command))
     subprocess.call([str(command)], shell=True)
 
