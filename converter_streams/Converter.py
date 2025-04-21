@@ -303,6 +303,7 @@ def tosca_to_k8s(operator_list, host_list, namespace_pack):
                     persistent_volumes.append(pv)
                     persistent_volumes.append(pvc)
                 ip = os.getenv("POD_IP", "ip")
+                ip = "mu-rabbit-rabbitmq.rabbit.svc.cluster.local"
                 password = os.getenv("RABBITMQ_PASSWORD", "password")
                 queues = y.get_queues()
                 properties = queues.get("properties")
