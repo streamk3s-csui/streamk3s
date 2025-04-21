@@ -402,7 +402,7 @@ def generate_queue(queue, application):
         "curl -u user:"
         + password
         + " -X PUT "
-        + ip
+        + "localhost"
         + ":30298/api/queues/"
         + application
         + "/"
