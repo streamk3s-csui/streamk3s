@@ -84,6 +84,8 @@ def write_rules_config(operatorlist, dirpath):
 
         password = os.getenv("RABBITMQ_PASSWORD", "password")
         ip = os.getenv("POD_IP", "ip")
+        # use the rabbitmq Cluster IP instead of the POD IP
+        ip = "mu-rabbit-rabbitmq.rabbit.svc.cluster.local"
         username = "user"
         uri = f"http://{username}:{password}@{ip}:15672/{namespace}"
 
